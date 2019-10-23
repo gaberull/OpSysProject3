@@ -16,7 +16,7 @@
  *         otherwise, a poiner to the initialized STORAGE object
  */
 
-STORAGE * init_storage(char * name)
+STORAGE * init_storage(char * name, char *pipe_name_base)
 {
   // Open the file
   int fd = open(name, O_RDWR | O_CREAT,
