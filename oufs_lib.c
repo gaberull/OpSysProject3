@@ -193,14 +193,15 @@ int oufs_list(char *cwd, char *path)
     // TODO: complete implementation
 
     }
-  }else {
-    // Did not find the specified file/directory
-    fprintf(stderr, "Not found\n");
-    if(debug)
-      fprintf(stderr, "\tDEBUG: (%d)\n", ret);
-  }
-  // Done: return the status from the search
-  return(ret);
+    else
+    {
+        // Did not find the specified file/directory
+        fprintf(stderr, "Not found\n");
+        if(debug)
+            fprintf(stderr, "\tDEBUG: (%d)\n", ret);
+    }
+    // Done: return the status from the search
+    return(ret);
 }
 
 
