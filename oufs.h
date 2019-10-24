@@ -108,7 +108,7 @@ typedef struct inode_s
 #define N_INODES_PER_BLOCK ((int)(DATA_BLOCK_SIZE/sizeof(INODE)))
 
 // Total number of inodes in the file system
-#define N_INODES (N_INODES_PER_BLOCK * N_INODE_BLOCKS)
+#define N_INODES (((N_INODES_PER_BLOCK * N_INODE_BLOCKS)>>3)<<3)
 
 // Block of inodes
 typedef struct inode_block_s

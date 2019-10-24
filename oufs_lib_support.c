@@ -64,7 +64,7 @@ int oufs_deallocate_block(BLOCK *master_block, BLOCK_REFERENCE block_reference)
  *  - Inode points to directory block (self_block_reference)
  *  - Inode size = 2 (for . and ..)
  *  - Direcory block: add entries . (self_inode_reference and .. (parent_inode_reference)
- *  -- Set all other entries to UNALLOCATED_BLOCK
+ *  -- Set all other entries to UNALLOCATED_INODE
  *
  * @param inode Pointer to inode structure to initialize
  * @param block Pointer to block structure to initialize as a directory
