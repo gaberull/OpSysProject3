@@ -126,7 +126,7 @@ typedef struct master_block_s
   // 8 inodes per byte: One inode per bit: 1 = allocated, 0 = free
   // Inode 0 (zero) is byte 0, bit 7 
   //       1        is byte 0, bit 6
-  //       8        is byte 0, bit 7
+  //       8        is byte 1, bit 7
   unsigned char inode_allocated_flag[N_INODES >> 3];
 
   // Double-ended linked list representation for unallocated blocks
