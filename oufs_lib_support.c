@@ -64,7 +64,7 @@ int oufs_deallocate_block(BLOCK *master_block, BLOCK_REFERENCE block_reference)
  *  Initialize an inode and a directory block structure as a new directory.
  *  - Inode points to directory block (self_block_reference)
  *  - Inode size = 2 (for . and ..)
- *  - Direcory block: add entries . (self_inode_reference and .. (parent_inode_reference)
+ *  - Directory block: add entries . (self_inode_reference and .. (parent_inode_reference)
  *  -- Set all other entries to UNALLOCATED_INODE
  *
  * @param inode Pointer to inode structure to initialize
@@ -136,9 +136,24 @@ int oufs_write_inode_by_reference(INODE_REFERENCE i, INODE *inode)
 {
   if(debug)
     fprintf(stderr, "\tDEBUG: Writing inode %d\n", i);
-
+    
   // TODO
-
+     BLOCK b;
+     // Update the new end block
+     if(virtual_disk_read_block(inode->content, &b) != 0) {
+         fprintf(stderr, "deallocate_block: error reading inode block\n");
+         return(-1);
+     }
+                             
+    b.content.inodes.inode[i] = *inode;
+                             
+     // Write the block back
+     if(virtual_disk_write_block(inode->content, &b) != 0) {
+         fprintf(stderr, "deallocate_block: error writing inode block\n");
+         return(-1);
+     }
+                             
+                             
   // Success
   return(0);
 }
