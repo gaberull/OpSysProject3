@@ -81,6 +81,7 @@ void oufs_get_environment(char *cwd, char *disk_name,
  *
  */
 
+//TODO: EC
 int oufs_format_disk(char  *virtual_disk_name, char *pipe_name_base)
 {
   // Attach to the virtual disk
@@ -99,11 +100,28 @@ int oufs_format_disk(char  *virtual_disk_name, char *pipe_name_base)
   }
 
   //////////////////////////////
-  // Master block
+    // Master block TODO: check that this works
   block.next_block = UNALLOCATED_BLOCK;
   block.content.master.inode_allocated_flag[0] = 0x80;
-
-  // TODO:  complete implementation
+    // configure front and end references
+    block.content.master.unallocated_front = N_INODE_BLOCKS+2; // this will be block #6
+    block.content.master.unallocated_end = N_BLOCKS-1;    // will be block # 127
+    // for loop to initialize linked list of free blocks
+    for (int i=1; i<127; i++)
+    {
+        BLOCK currBlock;
+        memset(&currBlock, 0, BLOCK_SIZE);
+        if (i == 126)
+        {
+            currBlock.next_block = UNALLOCATED_BLOCK;
+        }
+        else
+            currBlock.next_block = i+1;
+        if (virtual_disk_write_block(i, &currBlock)<0)
+        {
+            return -2;
+        }
+    }
   
   //////////////////////////////
   // Root directory inode / block
