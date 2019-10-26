@@ -38,6 +38,7 @@ int oufs_deallocate_block(BLOCK *master_block, BLOCK_REFERENCE block_reference)
 
   }else{
     // TODO
+      
   }
 
   // Update the new end block
@@ -77,7 +78,17 @@ void oufs_init_directory_structures(INODE *inode, BLOCK *block,
 				    INODE_REFERENCE self_inode_reference,
 				    INODE_REFERENCE parent_inode_reference)
 {
-  // TODO
+    // Initialize directory block
+    block->next_block = UNALLOCATED_BLOCK;
+    // set up '.'
+    block->content.directory.entry[0].inode_reference= self_inode_reference;
+    block->content.directory.entry[1].inode_reference= parent_inode_reference;
+    
+    // set up Inode
+    inode->type = DIRECTORY_TYPE;
+    inode->n_references = 1;
+    inode->size = 2;
+    inode->content=self_block_reference;
 }
 
 
