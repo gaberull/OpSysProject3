@@ -144,23 +144,23 @@ int oufs_write_inode_by_reference(INODE_REFERENCE i, INODE *inode)
     fprintf(stderr, "\tDEBUG: Writing inode %d\n", i);
     
     // TODO:
-     BLOCK b;
+    BLOCK_REFERENCE b = i / N_INODES_PER_BLOCK + 1;
+    int element = (i % N_INODES_PER_BLOCK);
     
-    
-     // Update the new end block
-     if(virtual_disk_read_block(inode->content, &b) != 0) {
+    BLOCK tempBlock;
+    // read the block from disk to tempBlock
+     if(virtual_disk_read_block(b, &tempBlock) != 0) {
          fprintf(stderr, "deallocate_block: error reading inode block\n");
          return(-1);
      }
-                             
-    b.content.inodes.inode[i] = *inode;
+    // set tempBlock's inode to the input inode
+    tempBlock.content.inodes.inode[element] = *inode;
                              
      // Write the block back
-     if(virtual_disk_write_block(inode->content, &b) != 0) {
+     if(virtual_disk_write_block(b, &tempBlock) != 0) {
          fprintf(stderr, "deallocate_block: error writing inode block\n");
          return(-1);
      }
-                             
                              
   // Success
   return(0);
