@@ -78,17 +78,23 @@ void oufs_init_directory_structures(INODE *inode, BLOCK *block,
 				    INODE_REFERENCE self_inode_reference,
 				    INODE_REFERENCE parent_inode_reference)
 {
+    // set up Inode
+    inode->type = DIRECTORY_TYPE;
+    inode->n_references = 1;
+    inode->size = 2;
+    inode->content = self_block_reference;
+    
     // Initialize directory block
     block->next_block = UNALLOCATED_BLOCK;
     // set up '.'
     block->content.directory.entry[0].inode_reference= self_inode_reference;
     block->content.directory.entry[1].inode_reference= parent_inode_reference;
+    // set all other entries to UNALLOCATED_INODE
+    for (int i=2; i<N_DIRECTORY_ENTRIES_PER_BLOCK; i++)
+    {
+        block->content.directory.entry[i].inode_reference = UNALLOCATED_INODE;
+    }
     
-    // set up Inode
-    inode->type = DIRECTORY_TYPE;
-    inode->n_references = 1;
-    inode->size = 2;
-    inode->content=self_block_reference;
 }
 
 
@@ -137,8 +143,10 @@ int oufs_write_inode_by_reference(INODE_REFERENCE i, INODE *inode)
   if(debug)
     fprintf(stderr, "\tDEBUG: Writing inode %d\n", i);
     
-  // TODO
+    // TODO:
      BLOCK b;
+    
+    
      // Update the new end block
      if(virtual_disk_read_block(inode->content, &b) != 0) {
          fprintf(stderr, "deallocate_block: error reading inode block\n");

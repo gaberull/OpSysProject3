@@ -100,14 +100,19 @@ int oufs_format_disk(char  *virtual_disk_name, char *pipe_name_base)
   }
 
   //////////////////////////////
-    // Master block TODO: check that this works
+    // Master block
   block.next_block = UNALLOCATED_BLOCK;
   block.content.master.inode_allocated_flag[0] = 0x80;
     // configure front and end references
     block.content.master.unallocated_front = N_INODE_BLOCKS+2; // this will be block #6
     block.content.master.unallocated_end = N_BLOCKS-1;    // will be block # 127
-    // for loop to initialize linked list of free blocks
-    for (int i=1; i<127; i++)
+    // write master block to virtual disk
+    if (virtual_disk_write_block(0, &block)<0)
+    {
+        return -2;
+    }
+        // for loop to initialize linked list of free blocks
+    for (BLOCK_REFERENCE i=1; i<127; i++)
     {
         BLOCK currBlock;
         memset(&currBlock, 0, BLOCK_SIZE);
@@ -116,7 +121,8 @@ int oufs_format_disk(char  *virtual_disk_name, char *pipe_name_base)
             currBlock.next_block = UNALLOCATED_BLOCK;
         }
         else
-            currBlock.next_block = i+1;
+            currBlock.next_block = i+1; //TODO: this cast gonna work?
+        // Write each block to the virtual disk
         if (virtual_disk_write_block(i, &currBlock)<0)
         {
             return -2;
@@ -126,16 +132,21 @@ int oufs_format_disk(char  *virtual_disk_name, char *pipe_name_base)
   //////////////////////////////
   // Root directory inode / block
   INODE inode;
+    // ROOT_DIRECTORY_BLOCK is block #5
   oufs_init_directory_structures(&inode, &block, ROOT_DIRECTORY_BLOCK,
 				 ROOT_DIRECTORY_INODE, ROOT_DIRECTORY_INODE);
 
   // Write the results to the disk
-  if(oufs_write_inode_by_reference(0, &inode) != 0) {
+    if(oufs_write_inode_by_reference(0, &inode) != 0) {       //TODO: write this function in lib_support
     return(-3);
   }
 
   // TODO: complete implementation
-    
+    // write the directory block to disk
+    if (virtual_disk_write_block(ROOT_DIRECTORY_BLOCK, &block)<0)
+    {
+        return -2;
+    }
   //////////////////////////////
   // All other blocks are free blocks
 
