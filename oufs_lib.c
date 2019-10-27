@@ -128,6 +128,9 @@ int oufs_format_disk(char  *virtual_disk_name, char *pipe_name_base)
             return -2;
         }
     }
+    // TODO: check this is necessary
+    //  clear block again
+    memset(&block, 0, BLOCK_SIZE);
   
   //////////////////////////////
   // Root directory inode / block
