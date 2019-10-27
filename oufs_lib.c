@@ -181,8 +181,45 @@ static int inode_compare_to(const void *d1, const void *d2)
   DIRECTORY_ENTRY* e2 = (DIRECTORY_ENTRY*) d2;
 
   // TODO: complete implementation
-
-
+    // if e1 comes before e2 or if e1 is only valid one
+    int e1valid = 1;
+    int e2valid = 1;
+    if (e1->inode_reference == UNALLOCATED_INODE)    // TODO: make sure that this is how to check if inodes are invalid
+        e1valid = 0;
+    if (e2->inode_reference == UNALLOCATED_INODE)
+        e2valid = 0;
+    
+    if (e1valid)
+    {
+        if (e2valid)
+        {
+            // both valid. compare e1 and e2
+            if (e1->inode_reference < e2->inode_reference)
+            {
+                return -1;
+            }
+            else if (e1->inode_reference > e2->inode_reference)
+            {
+                return 1;
+            }
+            else return 0;
+        }
+        else    // e1 is valid, e2 is invalid
+        {
+            return -1;
+        }
+    }
+    else    // e1 is invalid
+    {
+        if (e2valid)    // e1 invalid, e2 valid
+        {
+            return 1;
+        }
+        else        // both invalid
+        {
+            return 0;
+        }
+    }
 }
 
 
@@ -193,7 +230,7 @@ static int inode_compare_to(const void *d1, const void *d2)
  * If a directory is listed, then the valid contents are printed in sorted order
  *   (as defined by strcmp()), one per line.  We know that a directory entry is
  *   valid if the inode_reference is not UNALLOCATED_INODE.
- *   Hint: qsort() will do to sort for you.  You just have to provide a compareTo()
+ *   Hint: qsort() will do the sort for you.  You just have to provide a compareTo()
  *   function (just like in Java!)
  *   Note: if an entry is a directory itself, then its name must be followed by "/"
  *
