@@ -93,7 +93,7 @@ int oufs_format_disk(char  *virtual_disk_name, char *pipe_name_base)
 
   // Zero out the block
   memset(&block, 0, BLOCK_SIZE);
-  for(int i = 0; i < N_BLOCKS; ++i) {
+  for(BLOCK_REFERENCE i = 0; i < N_BLOCKS; ++i) {
     if(virtual_disk_write_block(i, &block) < 0) {
       return(-2);
     }
@@ -124,7 +124,8 @@ int oufs_format_disk(char  *virtual_disk_name, char *pipe_name_base)
 				 ROOT_DIRECTORY_INODE, ROOT_DIRECTORY_INODE);
 
   // Write the results to the disk
-    if(oufs_write_inode_by_reference(0, &inode) != 0) {       //TODO: write this function in lib_support
+    if(oufs_write_inode_by_reference(0, &inode) != 0) {
+        // TODO: write inode block to disk
     return(-3);
   }
 
