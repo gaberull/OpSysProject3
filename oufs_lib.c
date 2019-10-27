@@ -111,23 +111,7 @@ int oufs_format_disk(char  *virtual_disk_name, char *pipe_name_base)
     {
         return -2;
     }
-        // for loop to initialize linked list of free blocks
-    for (BLOCK_REFERENCE i=1; i<128; i++)
-    {
-        BLOCK currBlock;
-        memset(&currBlock, 0, BLOCK_SIZE);
-        if (i == 127)
-        {
-            currBlock.next_block = UNALLOCATED_BLOCK;
-        }
-        else
-            currBlock.next_block = i+1; //TODO: this cast gonna work?
-        // Write each block to the virtual disk
-        if (virtual_disk_write_block(i, &currBlock)<0)
-        {
-            return -2;
-        }
-    }
+    
     // TODO: check if this is necessary
     //  clear block again
     memset(&block, 0, BLOCK_SIZE);
@@ -152,7 +136,22 @@ int oufs_format_disk(char  *virtual_disk_name, char *pipe_name_base)
     }
   //////////////////////////////
   // All other blocks are free blocks
-
+    // for loop to initialize linked list of free blocks
+    for (BLOCK_REFERENCE i=6; i<N_BLOCKS; i++)       // TODO: check this numbering
+    {
+        memset(&block, 0, BLOCK_SIZE);
+        if (i == 127)
+        {
+            block.next_block = UNALLOCATED_BLOCK;
+        }
+        else
+            block.next_block = i+1; //TODO: this cast gonna work?
+        // Write each block to the virtual disk
+        if (virtual_disk_write_block(i, &block)<0)
+        {
+            return -2;
+        }
+    }
   // TODO: complete
 
   
