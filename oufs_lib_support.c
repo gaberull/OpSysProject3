@@ -286,9 +286,9 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
           sizeDir = start.size;
           if (b.content.directory.entry[index].name == directory_name)
           {
-              directory_name = strtok(full_path, "/");
               while(directory_name != NULL)
               {
+                  directory_name = strtok(NULL, "/");
                   if(strlen(directory_name) >= FILE_NAME_SIZE-1)
                       // Truncate the name
                       directory_name[FILE_NAME_SIZE - 1] = 0;
