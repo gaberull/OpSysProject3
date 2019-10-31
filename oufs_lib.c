@@ -81,7 +81,6 @@ void oufs_get_environment(char *cwd, char *disk_name,
  *
  */
 
-//TODO: EC
 int oufs_format_disk(char  *virtual_disk_name, char *pipe_name_base)
 {
   // Attach to the virtual disk
@@ -112,7 +111,6 @@ int oufs_format_disk(char  *virtual_disk_name, char *pipe_name_base)
         return -2;
     }
     
-    // TODO: check if this is necessary
     //  clear block again
     memset(&block, 0, BLOCK_SIZE);
   
@@ -124,21 +122,21 @@ int oufs_format_disk(char  *virtual_disk_name, char *pipe_name_base)
 				 ROOT_DIRECTORY_INODE, ROOT_DIRECTORY_INODE);
 
   // Write the results to the disk
-    if(oufs_write_inode_by_reference(0, &inode) != 0) {
-        // TODO: write inode block to disk
-    return(-3);
-  }
+    if(oufs_write_inode_by_reference(0, &inode) != 0)
+    {
+        return(-3);
+    }
 
-  // TODO: complete implementation
     // write the directory block to disk
     if (virtual_disk_write_block(ROOT_DIRECTORY_BLOCK, &block)<0)
     {
         return -2;
     }
+    
   //////////////////////////////
   // All other blocks are free blocks
     // for loop to initialize linked list of free blocks
-    for (BLOCK_REFERENCE i=6; i<N_BLOCKS; i++)       // TODO: check this numbering
+    for (BLOCK_REFERENCE i=6; i<N_BLOCKS; i++)
     {
         memset(&block, 0, BLOCK_SIZE);
         if (i == 127)
@@ -146,16 +144,13 @@ int oufs_format_disk(char  *virtual_disk_name, char *pipe_name_base)
             block.next_block = UNALLOCATED_BLOCK;
         }
         else
-            block.next_block = i+1; //TODO: this cast gonna work?
+            block.next_block = i+1;
         // Write each block to the virtual disk
         if (virtual_disk_write_block(i, &block)<0)
         {
             return -2;
         }
     }
-  // TODO: complete
-
-  
   // Done
   virtual_disk_detach();
  
@@ -184,7 +179,7 @@ static int inode_compare_to(const void *d1, const void *d2)
     // if e1 comes before e2 or if e1 is only valid one
     int e1valid = 1;
     int e2valid = 1;
-    if (e1->inode_reference == UNALLOCATED_INODE)    // TODO: make sure that this is how to check if inodes are invalid
+    if (e1->inode_reference == UNALLOCATED_INODE)
         e1valid = 0;
     if (e2->inode_reference == UNALLOCATED_INODE)
         e2valid = 0;

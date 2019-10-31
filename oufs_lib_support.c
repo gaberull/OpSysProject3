@@ -222,7 +222,7 @@ int oufs_find_directory_element(INODE *inode, char *element_name)
  * @param cwd Absolute path for the current working directory
  * @param path Absolute or relative path of the file/directory to be found
  * @param parent Pointer to the found inode reference for the parent directory
- * @param child ointer to the found node reference for the file or directory specified by path
+ * @param child pointer to the found node reference for the file or directory specified by path
  * @param local_name String name of the file or directory without any path information
  *             (i.e., name relative to the parent)
  * @return 0 if no errors
@@ -236,10 +236,10 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
   INODE_REFERENCE grandparent;
   char full_path[MAX_PATH_LENGTH];
 
-  // Construct an absolute path the file/directory in question
+  // Construct an absolute path for the file/directory in question
   if(path[0] == '/') {
     strncpy(full_path, path, MAX_PATH_LENGTH-1);
-  }else{
+  }else{    // path is a relative path
     if(strlen(cwd) > 1) {
       strncpy(full_path, cwd, MAX_PATH_LENGTH-1);
       strncat(full_path, "/", 2);
@@ -255,7 +255,6 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
   };
 
   // Start scanning from the root directory
-  // Root directory inode
   grandparent = *parent = *child = 0;
   if(debug)
     fprintf(stderr, "\tDEBUG: Start search: %d\n", *parent);
@@ -270,9 +269,59 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
     if(debug){
       fprintf(stderr, "\tDEBUG: Directory: %s\n", directory_name);
     }
-
-    // TODO
-
+      // TODO: finish
+      // Start with root directory inode
+      INODE start;
+      BLOCK b;
+      memset(&b, 0, sizeof(BLOCK));
+      int found = 0;
+      int index = 0;
+      int sizeDir = 0;
+      while (!found)
+      {
+          //TODO: Do i need to zero out INODE start?
+          oufs_read_inode_by_reference(*child, &start);
+          // read block from virtual disk
+          virtual_disk_read_block(start.content, &b);
+          sizeDir = start.size;
+          if (b.content.directory.entry[index].name == directory_name)
+          {
+              directory_name = strtok(full_path, "/");
+              while(directory_name != NULL)
+              {
+                  if(strlen(directory_name) >= FILE_NAME_SIZE-1)
+                      // Truncate the name
+                      directory_name[FILE_NAME_SIZE - 1] = 0;
+              }
+              grandparent = *parent;
+              *parent = *child;
+              *child = b.content.directory.entry[index].inode_reference;
+              index = 0;
+          }
+          else if (b.content.directory.entry[index].name == local_name)
+          {
+              // TODO: double check that we have gone through whole path first
+              found = 1;
+              grandparent = *parent;
+              *parent = *child;
+              *child = b.content.directory.entry[index].inode_reference;
+          }
+          else
+          {
+              // update index
+              index++;
+              if (index > sizeDir)
+              {
+                      break;
+              }
+          }
+      }
+      if (!found)
+      {
+          *child = UNALLOCATED_INODE;
+          *parent = UNALLOCATED_INODE;
+          return (-1);
+      }
   };
 
   // Item found.
