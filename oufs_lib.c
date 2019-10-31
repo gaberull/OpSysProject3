@@ -255,7 +255,33 @@ int oufs_list(char *cwd, char *path)
       fprintf(stderr, "\tDEBUG: Child found (type=%s).\n",  INODE_TYPE_NAME[inode.type]);
 
     // TODO: complete implementation
-
+      // Have the child inode
+      // check if it is a directory or a file inode
+      if (inode.type == DIRECTORY_TYPE)
+      {
+          int size = inode.size;
+          BLOCK b;
+          memset(&b, 0, sizeof(BLOCK));
+          // probably want to print off directory block
+          virtual_disk_read_block(inode.content, &b);
+          qsort(&b.content.directory.entry, size, sizeof(BLOCK), inode_compare_to);
+          for (int i = 0; i < size; i++)
+          {
+              printf("%d\n", b.content.directory.entry[i]);
+          }
+      }
+      else if (inode.type == FILE_TYPE)
+      {
+          BLOCK b;
+          memset(&b, 0, sizeof(BLOCK));
+          virtual_disk_read_block(inode.content, &b);
+          for (int n = 0; n<inode.size; n++)
+          {
+              printf("%c\n", b.content.data.data[n]);
+          }
+      }
+      else
+          return (-2);
     }
     else
     {
