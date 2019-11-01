@@ -255,28 +255,44 @@ int oufs_list(char *cwd, char *path)
       fprintf(stderr, "\tDEBUG: Child found (type=%s).\n",  INODE_TYPE_NAME[inode.type]);
 
     // TODO: complete implementation
+      BLOCK b;
+      memset(&b, 0, sizeof(BLOCK));
+      virtual_disk_read_block(inode.content, &b);
       // Have the child inode
       // check if it is a directory or a file inode
       if (inode.type == DIRECTORY_TYPE)
       {
-          int size = inode.size;
-          BLOCK b;
-          memset(&b, 0, sizeof(BLOCK));
+          //int size = inode.size;// inode.size is probably wrong. Need to check something else
           // probably want to print off directory block
-          virtual_disk_read_block(inode.content, &b);
-          qsort(&b.content.directory.entry, size, sizeof(BLOCK), inode_compare_to);
-          for (int i = 0; i < size; i++)
+          // Don't need pointer below?? According to TA
+          qsort(b.content.directory.entry, N_DIRECTORY_ENTRIES_PER_BLOCK, sizeof(b.content.directory.entry[0]), inode_compare_to);
+          for (int i = 0; i < N_DIRECTORY_ENTRIES_PER_BLOCK; i++)
           {
-              printf("%d\n", b.content.directory.entry[i]);
+              // May be holes in the directory. So must check whole list. Not just inode.size many
+              if (b.content.directory.entry[i].inode_reference != UNALLOCATED_INODE)
+              {
+                  // TODO: STill need to check if the entry is a directory and if so, add a / to the end
+                  // TODO: check if I can write over the inode at this point
+                  // check to see if inode_reference of the entry is a directory or not
+                  oufs_read_inode_by_reference(b.content.directory.entry[i].inode_reference, &inode);
+                  if (inode.type == DIRECTORY_TYPE)
+                  {
+                      // add a slash to the directory name
+                      printf("%s/\n", b.content.directory.entry[i].name);
+                  }
+                  else
+                  {
+                      printf("%s\n", b.content.directory.entry[i].name);
+                  }
+                      
+              }
           }
       }
       else if (inode.type == FILE_TYPE)
       {
-          BLOCK b;
-          memset(&b, 0, sizeof(BLOCK));
-          virtual_disk_read_block(inode.content, &b);
-          for (int n = 0; n<inode.size; n++)
+          for (int n = 0; n<DATA_BLOCK_SIZE; n++)
           {
+              // data[n] is unsigned char. So i think a printf with %c should do it
               printf("%c\n", b.content.data.data[n]);
           }
       }
