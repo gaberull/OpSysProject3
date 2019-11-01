@@ -282,7 +282,7 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
           oufs_read_inode_by_reference(*child, &start);
           // read block from virtual disk
           virtual_disk_read_block(start.content, &b);
-          if (b.content.directory.entry[index].name == directory_name)
+          if(strcmp(b.content.directory.entry[index].name, directory_name) == 0)
           {
               while(directory_name != NULL)
               {
@@ -296,7 +296,7 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
               *child = b.content.directory.entry[index].inode_reference;
               index = 0;
           }
-          else if (b.content.directory.entry[index].name == local_name)
+          else if(strcmp(b.content.directory.entry[index].name, local_name) == 0)
           {
               // TODO: double check that we have gone through whole path first
               found = 1;
