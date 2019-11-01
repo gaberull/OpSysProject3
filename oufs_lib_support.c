@@ -276,14 +276,12 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
       memset(&b, 0, sizeof(BLOCK));
       int found = 0;
       int index = 0;
-      int sizeDir = 0;
       while (!found)
       {
           //TODO: Do i need to zero out INODE start?
           oufs_read_inode_by_reference(*child, &start);
           // read block from virtual disk
           virtual_disk_read_block(start.content, &b);
-          sizeDir = start.size;
           if (b.content.directory.entry[index].name == directory_name)
           {
               while(directory_name != NULL)
@@ -310,7 +308,7 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
           {
               // update index
               index++;
-              if (index > sizeDir)
+              if (index > N_DIRECTORY_ENTRIES_PER_BLOCK)
               {
                       break;
               }
