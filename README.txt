@@ -10,3 +10,6 @@ http://www.cplusplus.com/reference/cstring/strcpy/
 http://www.cplusplus.com/reference/cstdlib/qsort/
 http://man7.org/linux/man-pages/man3/strnlen.3.html
 http://www.cplusplus.com/reference/cstring/strncat/?kw=strncat
+https://www.geeksforgeeks.org/strtok-strtok_r-functions-c-examples/
+http://www.cplusplus.com/reference/cstdio/printf/
+https://www.geeksforgeeks.org/sizeof-operator-c/
