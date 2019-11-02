@@ -284,14 +284,14 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
           virtual_disk_read_block(start.content, &b);
           if(strcmp(b.content.directory.entry[index].name, directory_name) == 0)
           {
-              // TODO: check this strtok call. Could be causing errors
-              //while(directory_name != NULL)
-              //{
+               //TODO: check this strtok call. Could be causing errors. Check the while loop too.
+              while(directory_name != NULL)
+              {
                   directory_name = strtok(NULL, "/");
                   if(strlen(directory_name) >= FILE_NAME_SIZE-1)
                       // Truncate the name
                       directory_name[FILE_NAME_SIZE - 1] = 0;
-              //}
+              }
               grandparent = *parent;
               *parent = *child;
               *child = b.content.directory.entry[index].inode_reference;
