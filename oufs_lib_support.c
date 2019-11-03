@@ -295,13 +295,13 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
           oufs_read_inode_by_reference(*child, &start);
           *child = (INODE_REFERENCE)oufs_find_directory_element(&start, directory_name);
       fprintf(stderr, "%d\n", *child);
-            if (*child == (INODE_REFERENCE)-1)
+            if ((int)*child == -1)
           {
               // inode is a file
               // TODO: find out if this shit is correct or not
               fprintf(stderr, "%s\n", "should never happen due to not having to handle files?");
           }
-          if (*child != UNALLOCATED_INODE)
+          else if (*child != UNALLOCATED_INODE)
           {
               //found subdirectory
               grandparent = *parent;
