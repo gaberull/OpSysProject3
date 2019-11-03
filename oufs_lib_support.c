@@ -205,13 +205,14 @@ void oufs_set_inode(INODE *inode, INODE_TYPE type, int n_references,
 
 int oufs_find_directory_element(INODE *inode, char *element_name)
 {
-  //if(debug)
+  if(debug)
     fprintf(stderr,"\tDEBUG: oufs_find_directory_element: %s\n", element_name);
 
   // TODO
     // TODO: should I return -1 for its "must be directory inode" if not directory inode??
     if (inode->type == DIRECTORY_TYPE)
     {
+        fprintf(stderr, "%s\n", "inside if(inode->type == DIREcTORY_TYPE");
         BLOCK b;
         memset(&b, 0, sizeof(BLOCK));
         virtual_disk_read_block(inode->content, &b);
