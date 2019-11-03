@@ -218,6 +218,7 @@ int oufs_find_directory_element(INODE *inode, char *element_name)
         virtual_disk_read_block(inode->content, &b);
         for (int i=0; i<N_DIRECTORY_ENTRIES_PER_BLOCK; i++)
         {
+            fprintf(stderr, "%s", "%d\n", "evaluating", i);
             if(strcmp(b.content.directory.entry[i].name, element_name) == 0)
             {
                 return b.content.directory.entry[i].inode_reference;
