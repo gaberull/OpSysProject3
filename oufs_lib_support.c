@@ -205,7 +205,7 @@ void oufs_set_inode(INODE *inode, INODE_TYPE type, int n_references,
 
 int oufs_find_directory_element(INODE *inode, char *element_name)
 {
-  if(debug)
+  //if(debug)
     fprintf(stderr,"\tDEBUG: oufs_find_directory_element: %s\n", element_name);
 
   // TODO
