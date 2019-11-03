@@ -209,6 +209,22 @@ int oufs_find_directory_element(INODE *inode, char *element_name)
     fprintf(stderr,"\tDEBUG: oufs_find_directory_element: %s\n", element_name);
 
   // TODO
+    // TODO: should I return -1 for its "must be directory inode" if not directory inode??
+    if (inode->type == DIRECTORY_TYPE)
+    {
+        BLOCK b;
+        memset(&b, 0, sizeof(BLOCK));
+        virtual_disk_read_block(inode->content, &b);
+        for (int i=0; i<N_DIRECTORY_ENTRIES_PER_BLOCK; i++)
+        {
+            if(strcmp(b.content.directory.entry[i].name, element_name) == 0)
+            {
+                return b.content.directory.entry[i].inode_reference;
+            }
+        }
+        return UNALLOCATED_INODE;
+    }
+    return (-1);
 }
 
 /**
@@ -270,57 +286,31 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
       fprintf(stderr, "\tDEBUG: Directory: %s\n", directory_name);
     }
       // TODO: finish
-      // Start with root directory inode
+      
       INODE start;
       BLOCK b;
       memset(&b, 0, sizeof(BLOCK));
-      int found = 0;
-      int index = 0;
-      while (!found)
-      {
-          //TODO: Do i need to zero out INODE start?
           oufs_read_inode_by_reference(*child, &start);
-          // read block from virtual disk
-          virtual_disk_read_block(start.content, &b);
-          if(strcmp(b.content.directory.entry[index].name, directory_name) == 0)
+          *child = (INODE_REFERENCE)oufs_find_directory_element(&start, directory_name);
+          if (*child == (INODE_REFERENCE)-1)
           {
-               //TODO: check this strtok call. Could be causing errors. Check the while loop too.
-              while(directory_name != NULL)
-              {
-                  directory_name = strtok(NULL, "/");
-                  if(strlen(directory_name) >= FILE_NAME_SIZE-1)
-                      // Truncate the name
-                      directory_name[FILE_NAME_SIZE - 1] = 0;
-              }
-              grandparent = *parent;
-              *parent = *child;
-              *child = b.content.directory.entry[index].inode_reference;
-              index = 0;
+              // inode is a file
+              // TODO: find out if this shit is correct or not
+              fprintf(stderr, "%s\n", "should never happen due to not having to handle files?");
           }
-          else if(strcmp(b.content.directory.entry[index].name, local_name) == 0)
+          if (*child != UNALLOCATED_INODE)
           {
-              // TODO: double check that we have gone through whole path first
-              found = 1;
+              //found subdirectory
               grandparent = *parent;
               *parent = *child;
-              *child = b.content.directory.entry[index].inode_reference;
+              directory_name = strtok(NULL, "/");
           }
           else
           {
-              // update index
-              index++;
-              if (index > N_DIRECTORY_ENTRIES_PER_BLOCK)
-              {
-                      break;
-              }
+              //unallocated inode
+              return (-1);
           }
-      }
-      if (!found)
-      {
-          *child = UNALLOCATED_INODE;
-          *parent = UNALLOCATED_INODE;
-          return (-1);
-      }
+
   };
 
   // Item found.
