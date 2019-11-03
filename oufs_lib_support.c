@@ -290,15 +290,15 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
       INODE start;
       BLOCK b;
       memset(&b, 0, sizeof(BLOCK));
-          oufs_read_inode_by_reference(*child, &start);
-          *child = (INODE_REFERENCE)oufs_find_directory_element(&start, directory_name);
-            if ((int)*child == -1)
+      oufs_read_inode_by_reference(*child, &start);
+          INODE_REFERENCE temp = (INODE_REFERENCE)oufs_find_directory_element(&start, directory_name);
+            if ((int)temp == -1)
           {
               // inode is a file
               // TODO: find out if this shit is correct or not
               //fprintf(stderr, "%s\n", "This is a file not a directory");
           }
-          else if (*child != UNALLOCATED_INODE)
+          else if (temp != UNALLOCATED_INODE)
           {
               //found subdirectory
               grandparent = *parent;
@@ -310,7 +310,8 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
               //unallocated inode
               return (-1);
           }
-
+      
+      *child = temp;
   };
 
   // Item found.
