@@ -189,11 +189,11 @@ static int inode_compare_to(const void *d1, const void *d2)
         if (e2valid)
         {
             // both valid. compare e1 and e2
-            if (e1->inode_reference < e2->inode_reference)
+            if (strcmp(e1->name, e2->name) < 0)
             {
                 return -1;
             }
-            else if (e1->inode_reference > e2->inode_reference)
+            else if (strcmp(e1->name, e2->name) > 0)
             {
                 return 1;
             }
@@ -262,8 +262,6 @@ int oufs_list(char *cwd, char *path)
       // check if it is a directory or a file inode
       if (inode.type == DIRECTORY_TYPE)
       {
-          //int size = inode.size;// inode.size is probably wrong. Need to check something else
-          // probably want to print off directory block
           // Don't need pointer below?? According to TA
           qsort(b.content.directory.entry, N_DIRECTORY_ENTRIES_PER_BLOCK, sizeof(b.content.directory.entry[0]), inode_compare_to);
           for (int i = 0; i < N_DIRECTORY_ENTRIES_PER_BLOCK; i++)
