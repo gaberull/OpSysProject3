@@ -212,13 +212,11 @@ int oufs_find_directory_element(INODE *inode, char *element_name)
     // TODO: should I return -1 for its "must be directory inode" if not directory inode??
     if (inode->type == DIRECTORY_TYPE)
     {
-        fprintf(stderr, "%s\n", "inside if(inode->type == DIREcTORY_TYPE");
         BLOCK b;
         memset(&b, 0, sizeof(BLOCK));
         virtual_disk_read_block(inode->content, &b);
         for (int i=0; i<N_DIRECTORY_ENTRIES_PER_BLOCK; i++)
         {
-            fprintf(stderr, "%s %d\n", "evaluating", i);
             if(strcmp(b.content.directory.entry[i].name, element_name) == 0)
             {
                 return b.content.directory.entry[i].inode_reference;
@@ -294,12 +292,11 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
       memset(&b, 0, sizeof(BLOCK));
           oufs_read_inode_by_reference(*child, &start);
           *child = (INODE_REFERENCE)oufs_find_directory_element(&start, directory_name);
-      fprintf(stderr, "%d\n", *child);
             if ((int)*child == -1)
           {
               // inode is a file
               // TODO: find out if this shit is correct or not
-              fprintf(stderr, "%s\n", "should never happen due to not having to handle files?");
+              //fprintf(stderr, "%s\n", "This is a file not a directory");
           }
           else if (*child != UNALLOCATED_INODE)
           {
