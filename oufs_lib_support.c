@@ -294,7 +294,8 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
       memset(&b, 0, sizeof(BLOCK));
           oufs_read_inode_by_reference(*child, &start);
           *child = (INODE_REFERENCE)oufs_find_directory_element(&start, directory_name);
-          if (*child == (INODE_REFERENCE)-1)
+      fprintf(stderr, "%d\n", *child);
+            if (*child == (INODE_REFERENCE)-1)
           {
               // inode is a file
               // TODO: find out if this shit is correct or not
