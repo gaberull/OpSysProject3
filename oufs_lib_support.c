@@ -340,7 +340,38 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
 int oufs_find_open_bit(unsigned char value)
 {
   // TODO
-
+    
+                            /*
+    int position = 7;
+    int next = 1;
+    next = next << 7;
+    // using AND operation
+    while (value & next)
+    {
+        next = next >> 1;
+        position--;
+    }
+    return position;
+                             */
+    
+    
+    // ones should be 1111 1111
+    unsigned char ones = ~0u;
+    // handle no bits available
+    if (value == ones) return -1;
+    // handle all bits available
+    if ((value | 0x00) == 0) return 7;
+    // open bit must be between 0 and 6
+    int count = -1;
+    while (value != ones)
+    {
+        value >> 1;
+        count++;
+    }
+    
+    return count;
+    
+    
   // Not found
   return(-1);
 }
