@@ -356,7 +356,8 @@ int oufs_find_open_bit(unsigned char value)
     
     
     // ones should be 1111 1111
-    unsigned char ones = ~0u;
+    //unsigned char ones = ~0u;
+    char ones = 0xFF;
     // handle no bits available
     if (value == ones) return -1;
     // handle all bits available
@@ -368,10 +369,7 @@ int oufs_find_open_bit(unsigned char value)
         value >> 1;
         count++;
     }
-    
     return count;
-    
-    
   // Not found
   return(-1);
 }

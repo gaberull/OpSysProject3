@@ -343,19 +343,49 @@ int oufs_mkdir(char *cwd, char *path)
   };
     // CHILD MUST NOT EXIST!??!
   // TODO: complete implementation
-    child = oufs_allocate_new_directory(parent);
-    if (child == UNALLOCATED_INODE)
-    {
-        fprintf(stderr, "oufs_mkdir(): got UNALLOCATED_INODE calling allocate_new_dir");
-        return (-3);
-    }
+
+    
     // parent inode and block
     INODE parentinode;
     oufs_read_inode_by_reference(parent, &parentinode);
+    
     BLOCK pblock;
     // TODO: Is this read in right spot?
     virtual_disk_read_block(parentinode.content, &pblock);
     
+    INODE_REFERENCE grandParent = pblock.content.directory.entry[1].inode_reference;
+    INODE gParentinode;
+    oufs_read_inode_by_reference(grandParent, &gParentinode);
+    BLOCK gPblock;
+    virtual_disk_read_block(gParentinode.content, &gPblock);
+    
+    char* parentName;
+    for(int i =2; i <N_DIRECTORY_ENTRIES_PER_BLOCK; i++)
+    {
+        if(gPblock.content.directory.entry[i].inode_reference== parent)
+        {
+            strcpy(gPblock.content.directory.entry[i].name, parentName);
+            break;
+        }
+    }
+    char* dir= strtok(path, "/");
+    while(dir!= NULL)
+    {
+        if(strcmp(dir, parentName)==0)
+        {
+            dir= strtok(NULL, "/");
+            break;
+        }
+        dir= strtok(NULL, "/");
+    }
+                    /*
+    // get child block to get name to store in parent directory
+    INODE cnode;
+    oufs_read_inode_by_reference(child, &cnode);
+    BLOCK cblock;
+    virtual_disk_read_block(cnode.content, &cblock);
+    cblock.content.directory.entry[.name
+                                   */
     
     // add to parent directory and increment size
     
@@ -364,12 +394,17 @@ int oufs_mkdir(char *cwd, char *path)
     {
         if (pblock.content.directory.entry[i].inode_reference == UNALLOCATED_INODE)
         {
-            // TODO: DO I NEED TO DO THIS??
-            local_name[FILE_NAME_SIZE - 1] = 0;
+            child = oufs_allocate_new_directory(parent);
+            if (child == UNALLOCATED_INODE)
+            {
+                fprintf(stderr, "oufs_mkdir(): got UNALLOCATED_INODE calling allocate_new_dir");
+                return (-3);
+            }
             // TODO: local_name?????
             pblock.content.directory.entry[i].inode_reference =  child;// insert new inode ref
             // TODO: make sure this strcpy is correct and will work
-            strcpy(&pblock.content.directory.entry[i].name, local_name);
+            
+            strcpy(pblock.content.directory.entry[i].name, dir);
             parentinode.size++;
             // write parent directory block and inode back to disk
             virtual_disk_write_block(parentinode.content, &pblock);
