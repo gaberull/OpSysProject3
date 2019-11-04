@@ -416,11 +416,22 @@ int oufs_allocate_new_directory(INODE_REFERENCE parent_reference)
     INODE inode;
     // read the inode from virtual disk TODO: need this??
     oufs_read_inode_by_reference(newdir, &inode);
-    // using a temporary variable
+    
+    // using a temporary variable for the block at front of list
     BLOCK_REFERENCE temp = block.content.master.unallocated_front;
+    if (temp == UNALLOCATED_BLOCK)
+        return UNALLOCATED_INODE;
     virtual_disk_read_block(temp, &block2);
-    //TODO: not sure if i should be changing the next block in master list here or not
-    block.content.master.unallocated_front = block2.next_block;
+    
+    //TODO: set the end of the chain to UNALLOCATED IF NONE LEFT
+    if (block2.next_block == UNALLOCATED_BLOCK)
+    {
+        block.content.master.unallocated_front = block.content.master.unallocated_end = UNALLOCATED_BLOCK;
+    }
+    else        // TODO: double check this logic
+    {
+        block.content.master.unallocated_front = block2.next_block;
+    }
     // TODO: double check this call that all parameters are correct
     oufs_init_directory_structures(&inode, &block2, temp, newdir, parent_reference);
     // write inode and block to virtual disk

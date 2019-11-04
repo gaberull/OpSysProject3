@@ -341,9 +341,45 @@ int oufs_mkdir(char *cwd, char *path)
       fprintf(stderr, "oufs_mkdir(): ret = %d\n", ret);
     return(-1);
   };
-
+    // CHILD MUST NOT EXIST!??!
   // TODO: complete implementation
-
+    child = oufs_allocate_new_directory(parent);
+    if (child == UNALLOCATED_INODE)
+    {
+        fprintf(stderr, "oufs_mkdir(): got UNALLOCATED_INODE calling allocate_new_dir");
+        return (-3);
+    }
+    // parent inode and block
+    INODE parentinode;
+    oufs_read_inode_by_reference(parent, &parentinode);
+    BLOCK pblock;
+    // TODO: Is this read in right spot?
+    virtual_disk_read_block(parentinode.content, &pblock);
+    
+    
+    // add to parent directory and increment size
+    
+    // TODO: he says add it to first AVAILABLE ENTRY?????
+    for (int i=2; i<N_DIRECTORY_ENTRIES_PER_BLOCK; i++)
+    {
+        if (pblock.content.directory.entry[i].inode_reference == UNALLOCATED_INODE)
+        {
+            // TODO: DO I NEED TO DO THIS??
+            local_name[FILE_NAME_SIZE - 1] = 0;
+            // TODO: local_name?????
+            pblock.content.directory.entry[i].inode_reference =  child;// insert new inode ref
+            // TODO: make sure this strcpy is correct and will work
+            strcpy(&pblock.content.directory.entry[i].name, local_name);
+            parentinode.size++;
+            // write parent directory block and inode back to disk
+            virtual_disk_write_block(parentinode.content, &pblock);
+            oufs_write_inode_by_reference(parent, &parentinode);
+            return 0;
+        }
+    }
+        // no space to store directory if it hits this point
+        fprintf(stderr, "No space in directory to store new entry");
+        return (-2);
 }
 
 /**
