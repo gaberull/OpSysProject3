@@ -357,14 +357,20 @@ int oufs_find_open_bit(unsigned char value)
     fprintf(stderr, "inside oufs_find_open_bit 357");
     // ones should be 1111 1111
     //unsigned char ones = ~0u;
-    unsigned char ones = 0xFF;
+    //unsigned char ones = 0xFF;
     // handle no bits available
-    if (value == ones) return -1;
+    if ((value | 0x00) == 0xFF)
+    {
+        return -1;
+    }
     // handle all bits available
-    if ((value | 0x00) == 0) return 7;
+    if ((value | 0x00) == 0x00)
+    {
+        return 7;
+    }
     // open bit must be between 0 and 6
     int count = -1;
-    while (value != ones)
+    while (value != 0xFF)
     {
         value >> 1;
         value = (value | 0x80);
