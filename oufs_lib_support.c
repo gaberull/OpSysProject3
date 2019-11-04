@@ -372,7 +372,7 @@ int oufs_find_open_bit(unsigned char value)
     int count = -1;
     while (value != 0xFF)
     {
-        value >> 1;
+        value >>= 1;
         value = (value | 0x80);
         count++;
         fprintf(stderr, "inside while loop of oufs_find_open_bit 371");
