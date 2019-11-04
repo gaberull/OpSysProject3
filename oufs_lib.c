@@ -353,6 +353,8 @@ int oufs_mkdir(char *cwd, char *path)
     // TODO: Is this read in right spot?
     virtual_disk_read_block(parentinode.content, &pblock);
     
+    
+                        /*
     INODE_REFERENCE grandParent = pblock.content.directory.entry[1].inode_reference;
     INODE gParentinode;
     oufs_read_inode_by_reference(grandParent, &gParentinode);
@@ -368,15 +370,17 @@ int oufs_mkdir(char *cwd, char *path)
             break;
         }
     }
-    char* dir= strtok(path, "/");
-    while(dir!= NULL)
+                         */
+    
+    char* current= strtok(path, "/");
+    char* dir;
+    while(current!= NULL)
     {
-        if(strcmp(dir, parentName)==0)
+        current= strtok(NULL, "/");
+        if(current!=NULL)
         {
-            dir= strtok(NULL, "/");
-            break;
+            dir=current;
         }
-        dir= strtok(NULL, "/");
     }
                     /*
     // get child block to get name to store in parent directory
