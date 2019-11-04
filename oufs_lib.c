@@ -347,6 +347,7 @@ int oufs_mkdir(char *cwd, char *path)
     
     // parent inode and block
     INODE parentinode;
+    fprintf(stderr, "mkdir line 350");
     oufs_read_inode_by_reference(parent, &parentinode);
     
     BLOCK pblock;
@@ -381,6 +382,7 @@ int oufs_mkdir(char *cwd, char *path)
         {
             dir=current;
         }
+        fprintf(stderr, "end strtok loop in mkdir line 384");
     }
                     /*
     // get child block to get name to store in parent directory

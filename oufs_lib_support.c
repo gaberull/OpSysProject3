@@ -321,7 +321,7 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
     *parent = grandparent;
   }
   if(debug) {
-    fprintf(stderr, "\tDEBUG: Found: %d, %d\n", *parent, *child);
+    fprintf(stderr, "\tDEBUG: Found: parent %d, child %d\n", *parent, *child);
   }
   // Success!
   return(0);
@@ -400,7 +400,9 @@ int oufs_allocate_new_directory(INODE_REFERENCE parent_reference)
     {
         byte = i/8;
         // TODO: must make sure find_open_bit works for this function to work
+        fprintf(stderr, "before find_open_bit in allocate_new_dir line 403");
         bit = oufs_find_open_bit(block.content.master.inode_allocated_flag[byte]);
+        fprintf(stderr, "after find_open_bit in allocate_new_dir line 405");
         if (bit != -1)
         {
             newdir = (INODE_REFERENCE)i;
