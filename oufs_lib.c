@@ -398,6 +398,7 @@ int oufs_mkdir(char *cwd, char *path)
     {
         if (pblock.content.directory.entry[i].inode_reference == UNALLOCATED_INODE)
         {
+            fprintf(stderr, "inside for loop of mkdir line 401");
             child = oufs_allocate_new_directory(parent);
             if (child == UNALLOCATED_INODE)
             {

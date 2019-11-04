@@ -354,10 +354,10 @@ int oufs_find_open_bit(unsigned char value)
     return position;
                              */
     
-    
+    fprintf(stderr, "inside oufs_find_open_bit 357");
     // ones should be 1111 1111
-    //unsigned char ones = ~0u;
-    char ones = 0xFF;
+    unsigned char ones = ~0u;
+    //char ones = 0xFF;
     // handle no bits available
     if (value == ones) return -1;
     // handle all bits available
@@ -368,6 +368,7 @@ int oufs_find_open_bit(unsigned char value)
     {
         value >> 1;
         count++;
+        fprintf(stderr, "inside while loop of oufs_find_open_bit 371");
     }
     return count;
   // Not found
@@ -437,6 +438,7 @@ int oufs_allocate_new_directory(INODE_REFERENCE parent_reference)
     //  changed allocation table. write master block back to disk
     virtual_disk_write_block(MASTER_BLOCK_REFERENCE, &block);
     virtual_disk_write_block(temp, &block2); // TODO: changed to temp from inode.content. Check this
+    fprintf(stderr, "end of allocate_new_dir line 441");
     return newdir;
     
 };
