@@ -363,21 +363,37 @@ int oufs_find_open_bit(unsigned char value)
     {
         return -1;
     }
-    // handle all bits available
-    if ((value | 0x00) == 0x00)
+    else if ((value | 0x00) == 0x00)
     {
         return 7;
     }
-    // open bit must be between 0 and 6
-    int count = -1;
-    while (value != 0xFF)
+    // handle all bits available
+    else
     {
-        value = (value >> 1);
-        value = (value | 0x80);
-        count++;
-        fprintf(stderr, "inside while loop of oufs_find_open_bit 378");
+        for (int i=0; i<6; i++)
+        {
+            value = (value & (1<<i));
+            if (value == 0x00)
+                return i;
+        }
+        
+        
+        
+        
+                                                /*
+        
+        // open bit must be between 0 and 6
+        int count = -1;
+        while (value != 0xFF)
+        {
+            value = (value >> 1);
+            value = (value | 0x80);
+            count++;
+            fprintf(stderr, "inside while loop of oufs_find_open_bit 378");
+        }
+        return count;
+                                                 */
     }
-    return count;
   // Not found
   return(-1);
 }
