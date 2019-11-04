@@ -393,6 +393,41 @@ int oufs_allocate_new_directory(INODE_REFERENCE parent_reference)
     // Read error
     return(UNALLOCATED_INODE);
   }
-
   // TODO
+    INODE_REFERENCE newdir = UNALLOCATED_INODE;
+    int byte = -1;
+    int bit = -1;
+    for (int i=0; i<N_INODES; i++)
+    {
+        byte = i/8;
+        // TODO: must make sure find_open_bit works for this function to work
+        bit = oufs_find_open_bit(block.content.master.inode_allocated_flag[byte]);
+        if (bit != -1)
+        {
+            newdir = (INODE_REFERENCE)i;
+            break;
+        }
+    }
+    // couldn't find an open bit
+    if (bit == -1)
+        return UNALLOCATED_INODE;
+    // change allocation table to mark new one being allocated
+    block.content.master.inode_allocated_flag[byte] = block.content.master.inode_allocated_flag[byte] >>1;
+    INODE inode;
+    // read the inode from virtual disk TODO: need this??
+    oufs_read_inode_by_reference(newdir, &inode);
+    // using a temporary variable
+    BLOCK_REFERENCE temp = block.content.master.unallocated_front;
+    virtual_disk_read_block(temp, &block2);
+    //TODO: not sure if i should be changing the next block in master list here or not
+    block.content.master.unallocated_front = block2.next_block;
+    // TODO: double check this call that all parameters are correct
+    oufs_init_directory_structures(&inode, &block2, temp, newdir, parent_reference);
+    // write inode and block to virtual disk
+    oufs_write_inode_by_reference(newdir, &inode);
+    //  changed allocation table. write master block back to disk
+    virtual_disk_write_block(MASTER_BLOCK_REFERENCE, &block);
+    virtual_disk_write_block(temp, &block2); // TODO: changed to temp from inode.content. Check this
+    return newdir;
+    
 };
