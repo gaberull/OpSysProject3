@@ -359,7 +359,7 @@ int oufs_find_open_bit(unsigned char value)
     //unsigned char ones = ~0u;
     //unsigned char ones = 0xFF;
     // handle no bits available
-    if ((value | 0x00) == 0xFF)
+    if ((value ^ 0xFF) == 0x00)
     {
         return -1;
     }
