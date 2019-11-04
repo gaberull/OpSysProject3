@@ -356,8 +356,8 @@ int oufs_find_open_bit(unsigned char value)
     
     fprintf(stderr, "inside oufs_find_open_bit 357");
     // ones should be 1111 1111
-    unsigned char ones = ~0u;
-    //char ones = 0xFF;
+    //unsigned char ones = ~0u;
+    unsigned char ones = 0xFF;
     // handle no bits available
     if (value == ones) return -1;
     // handle all bits available
@@ -367,6 +367,7 @@ int oufs_find_open_bit(unsigned char value)
     while (value != ones)
     {
         value >> 1;
+        value = (value | 0x80);
         count++;
         fprintf(stderr, "inside while loop of oufs_find_open_bit 371");
     }
