@@ -347,14 +347,10 @@ int oufs_find_open_bit(unsigned char value)
     {
         return -1;
     }
-    else if ((value | 0x00) == 0x00)
-    {
-        return 7;
-    }
     // handle all bits available
     else
     {
-        for (int i=0; i<6; i++)
+        for (int i=0; i<7; i++)
         {
             if(value & (1<<i)==0)
             {
@@ -384,7 +380,7 @@ int oufs_allocate_new_directory(INODE_REFERENCE parent_reference)
     return(UNALLOCATED_INODE);
   }
   // TODO
-    INODE_REFERENCE newdir = UNALLOCATED_INODE;
+    INODE_REFERENCE newdir = UNALLOCATED_INODE;1000
     int byte = -1;
     int bit = -1;
     for (int i=0; i<N_INODES; i++)
@@ -392,9 +388,7 @@ int oufs_allocate_new_directory(INODE_REFERENCE parent_reference)
         // TODO: double check all this
         byte = i/8;
         // TODO: must make sure find_open_bit works for this function to work
-        fprintf(stderr, "before find_open_bit in allocate_new_dir line 403");
         bit = oufs_find_open_bit(block.content.master.inode_allocated_flag[byte]);
-        fprintf(stderr, "after find_open_bit in allocate_new_dir line 405");
         if (bit != -1)
         {
             // INODE REFERENCE may be j*8 + (7-i)
