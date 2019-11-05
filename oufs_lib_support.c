@@ -345,7 +345,7 @@ int oufs_find_open_bit(unsigned char value)
     
     //fprintf(stderr, "inside oufs_find_open_bit 357");
     // handle no bits available
-    fprintf(stderr, "value is %x\n" value);
+    fprintf(stderr, "value is %x\n", value);
     if ((value ^ 0xFF) == 0x00)
     {
         return -1;
