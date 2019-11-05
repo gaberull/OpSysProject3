@@ -304,6 +304,7 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
               grandparent = *parent;
               *parent = *child;
               strcpy(local_name, directory_name);
+              fprintf(stderr, "directory_name= %s \n", directory_name);
               directory_name = strtok(NULL, "/");
           }
           else
