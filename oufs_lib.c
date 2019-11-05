@@ -386,7 +386,7 @@ int oufs_mkdir(char *cwd, char *path)
             child = oufs_allocate_new_directory(parent);
             if (child == UNALLOCATED_INODE)
             {
-                fprintf(stderr, "%s\n", local_name);
+                fprintf(stderr, "local name = %s\n", local_name);
                 fprintf(stderr, "oufs_mkdir(): got UNALLOCATED_INODE calling allocate_new_dir");
                 return (-3);
             }
