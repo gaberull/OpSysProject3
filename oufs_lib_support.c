@@ -296,7 +296,7 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
           {
               // inode is a file
               // TODO: find out if this shit is correct or not
-              //fprintf(stderr, "%s\n", "This is a file not a directory");
+              fprintf(stderr, "%s\n", "This is a file not a directory");
           }
           else if (temp != UNALLOCATED_INODE)
           {
