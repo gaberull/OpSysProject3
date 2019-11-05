@@ -353,10 +353,10 @@ int oufs_find_open_bit(unsigned char value)
     // handle all bits available
     else
     {
-        for (int i=0; i<7; i++)
+        for (int i=7; i>0; i--)
         {
-            fprintf(stderr, "\nvalue & (1<<i) is %x \n", (value & (1<<(7-i))));
-            if((value & (1<<(7-i)))==0)
+            fprintf(stderr, "\nvalue & (1<<i) is %x \n", (value & (1<<i)));
+            if((value & (1<<i))==0)
             {
                 return i;
             }
@@ -430,6 +430,7 @@ int oufs_allocate_new_directory(INODE_REFERENCE parent_reference)
         block.content.master.unallocated_front = block2.next_block;
     }
     // TODO: double check this call that all parameters are correct
+    fprintf(stderr, "\n about to init directory structures \n");
     oufs_init_directory_structures(&inode, &block2, temp, newdir, parent_reference);
     // write inode and block to virtual disk
     oufs_write_inode_by_reference(newdir, &inode);
