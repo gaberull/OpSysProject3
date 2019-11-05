@@ -354,6 +354,8 @@ int oufs_mkdir(char *cwd, char *path)
     
     
     // TODO: Local_name should be being set inside find_file() and should be checked to not already exist
+    
+                                            /*
     char* current= strtok(path, "/");
     char* dir;
     while(current!= NULL)
@@ -365,6 +367,8 @@ int oufs_mkdir(char *cwd, char *path)
         }
         fprintf(stderr, "end strtok loop in mkdir line 384");
     }
+                                             */
+    
     /*
      // get child block to get name to store in parent directory
      INODE cnode;
@@ -389,7 +393,7 @@ int oufs_mkdir(char *cwd, char *path)
             }
             // TODO: local_name?????
             pblock.content.directory.entry[i].inode_reference =  child;// insert new inode ref
-            // TODO: make sure this strcpy is correct and will work
+            // FIXME: this name is not copying correctly
             
             strcpy(pblock.content.directory.entry[i].name, local_name);
             parentinode.size++;
