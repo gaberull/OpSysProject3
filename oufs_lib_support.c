@@ -393,6 +393,7 @@ int oufs_allocate_new_directory(INODE_REFERENCE parent_reference)
         // TODO: double check all this
         byte = i/8;
         // TODO: must make sure find_open_bit works for this function to work
+        fprintf(stderr, "block.content.master.inode_allocated_flag[byte] is %c\n", block.content.master.inode_allocated_flag[byte]);
         bit = oufs_find_open_bit(block.content.master.inode_allocated_flag[byte]);
         fprintf(stderr, "bit number is %d \n", bit);
         if (bit != -1)
