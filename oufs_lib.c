@@ -21,47 +21,45 @@ const char *INODE_TYPE_NAME[] = {"UNUSED", "DIRECTORY", "FILE"};
  variables copy their values into cwd, disk_name an pipe_name_base.  If these
  environment variables are not set, then reasonable defaults are
  given.
-
  @param cwd String buffer in which to place the OUFS current working directory.
  @param disk_name String buffer in which to place file name of the virtual disk.
  @param pipe_name_base String buffer in which to place the base name of the
-            named pipes for communication to the server.
-
+ named pipes for communication to the server.
  PROVIDED
  */
 void oufs_get_environment(char *cwd, char *disk_name,
-			  char *pipe_name_base)
+                          char *pipe_name_base)
 {
-  // Current working directory for the OUFS
-  char *str = getenv("OUFS_PWD");
-  if(str == NULL) {
-    // Provide default
-    strcpy(cwd, "/");
-  }else{
-    // Exists
-    strncpy(cwd, str, MAX_PATH_LENGTH-1);
-  }
-
-  // Virtual disk location
-  str = getenv("OUFS_DISK");
-  if(str == NULL) {
-    // Default
-    strcpy(disk_name, "vdisk1");
-  }else{
-    // Exists: copy
-    strncpy(disk_name, str, MAX_PATH_LENGTH-1);
-  }
-
-  // Pipe name base
-  str = getenv("OUFS_PIPE_NAME_BASE");
-  if(str == NULL) {
-    // Default
-    strcpy(pipe_name_base, "pipe");
-  }else{
-    // Exists: copy
-    strncpy(pipe_name_base, str, MAX_PATH_LENGTH-1);
-  }
-
+    // Current working directory for the OUFS
+    char *str = getenv("OUFS_PWD");
+    if(str == NULL) {
+        // Provide default
+        strcpy(cwd, "/");
+    }else{
+        // Exists
+        strncpy(cwd, str, MAX_PATH_LENGTH-1);
+    }
+    
+    // Virtual disk location
+    str = getenv("OUFS_DISK");
+    if(str == NULL) {
+        // Default
+        strcpy(disk_name, "vdisk1");
+    }else{
+        // Exists: copy
+        strncpy(disk_name, str, MAX_PATH_LENGTH-1);
+    }
+    
+    // Pipe name base
+    str = getenv("OUFS_PIPE_NAME_BASE");
+    if(str == NULL) {
+        // Default
+        strcpy(pipe_name_base, "pipe");
+    }else{
+        // Exists: copy
+        strncpy(pipe_name_base, str, MAX_PATH_LENGTH-1);
+    }
+    
 }
 
 /**
@@ -73,7 +71,7 @@ void oufs_get_environment(char *cwd, char *disk_name,
  * - Zero out all blocks on the disk.
  * - Initialize the master block: mark inode 0 as allocated and initialize
  *    the linked list of free blocks
- * - Initialize root directory inode 
+ * - Initialize root directory inode
  * - Initialize the root directory in block ROOT_DIRECTORY_BLOCK
  *
  * @return 0 if no errors
@@ -83,25 +81,25 @@ void oufs_get_environment(char *cwd, char *disk_name,
 
 int oufs_format_disk(char  *virtual_disk_name, char *pipe_name_base)
 {
-  // Attach to the virtual disk
-  if(virtual_disk_attach(virtual_disk_name, pipe_name_base) != 0) {
-    return(-1);
-  }
-
-  BLOCK block;
-
-  // Zero out the block
-  memset(&block, 0, BLOCK_SIZE);
-  for(BLOCK_REFERENCE i = 0; i < N_BLOCKS; ++i) {
-    if(virtual_disk_write_block(i, &block) < 0) {
-      return(-2);
+    // Attach to the virtual disk
+    if(virtual_disk_attach(virtual_disk_name, pipe_name_base) != 0) {
+        return(-1);
     }
-  }
-
-  //////////////////////////////
+    
+    BLOCK block;
+    
+    // Zero out the block
+    memset(&block, 0, BLOCK_SIZE);
+    for(BLOCK_REFERENCE i = 0; i < N_BLOCKS; ++i) {
+        if(virtual_disk_write_block(i, &block) < 0) {
+            return(-2);
+        }
+    }
+    
+    //////////////////////////////
     // Master block
-  block.next_block = UNALLOCATED_BLOCK;
-  block.content.master.inode_allocated_flag[0] = 0x80;
+    block.next_block = UNALLOCATED_BLOCK;
+    block.content.master.inode_allocated_flag[0] = 0x80;
     // configure front and end references
     block.content.master.unallocated_front = N_INODE_BLOCKS+2; // this will be block #6
     block.content.master.unallocated_end = N_BLOCKS-1;    // will be block # 127
@@ -113,28 +111,28 @@ int oufs_format_disk(char  *virtual_disk_name, char *pipe_name_base)
     
     //  clear block again
     memset(&block, 0, BLOCK_SIZE);
-  
-  //////////////////////////////
-  // Root directory inode / block
-  INODE inode;
+    
+    //////////////////////////////
+    // Root directory inode / block
+    INODE inode;
     // ROOT_DIRECTORY_BLOCK is block #5
-  oufs_init_directory_structures(&inode, &block, ROOT_DIRECTORY_BLOCK,
-				 ROOT_DIRECTORY_INODE, ROOT_DIRECTORY_INODE);
-
-  // Write the results to the disk
+    oufs_init_directory_structures(&inode, &block, ROOT_DIRECTORY_BLOCK,
+                                   ROOT_DIRECTORY_INODE, ROOT_DIRECTORY_INODE);
+    
+    // Write the results to the disk
     if(oufs_write_inode_by_reference(0, &inode) != 0)
     {
         return(-3);
     }
-
+    
     // write the directory block to disk
     if (virtual_disk_write_block(ROOT_DIRECTORY_BLOCK, &block)<0)
     {
         return -2;
     }
     
-  //////////////////////////////
-  // All other blocks are free blocks
+    //////////////////////////////
+    // All other blocks are free blocks
     // for loop to initialize linked list of free blocks
     for (BLOCK_REFERENCE i=6; i<N_BLOCKS; i++)
     {
@@ -151,10 +149,10 @@ int oufs_format_disk(char  *virtual_disk_name, char *pipe_name_base)
             return -2;
         }
     }
-  // Done
-  virtual_disk_detach();
- 
-  return(0);
+    // Done
+    virtual_disk_detach();
+    
+    return(0);
 }
 
 /*
@@ -171,11 +169,11 @@ int oufs_format_disk(char  *virtual_disk_name, char *pipe_name_base)
  */
 static int inode_compare_to(const void *d1, const void *d2)
 {
-  // Type casting from generic to DIRECTORY_ENTRY*
-  DIRECTORY_ENTRY* e1 = (DIRECTORY_ENTRY*) d1;
-  DIRECTORY_ENTRY* e2 = (DIRECTORY_ENTRY*) d2;
-
-  // TODO: complete implementation
+    // Type casting from generic to DIRECTORY_ENTRY*
+    DIRECTORY_ENTRY* e1 = (DIRECTORY_ENTRY*) d1;
+    DIRECTORY_ENTRY* e2 = (DIRECTORY_ENTRY*) d2;
+    
+    // TODO: complete implementation
     // if e1 comes before e2 or if e1 is only valid one
     int e1valid = 1;
     int e2valid = 1;
@@ -219,7 +217,7 @@ static int inode_compare_to(const void *d1, const void *d2)
 
 
 /**
- * Print out the specified file (if it exists) or the contents of the 
+ * Print out the specified file (if it exists) or the contents of the
  *   specified directory (if it exists)
  *
  * If a directory is listed, then the valid contents are printed in sorted order
@@ -238,64 +236,64 @@ static int inode_compare_to(const void *d1, const void *d2)
 
 int oufs_list(char *cwd, char *path)
 {
-  INODE_REFERENCE parent;
-  INODE_REFERENCE child;
-
-  // Look up the inodes for the parent and child
-  int ret = oufs_find_file(cwd, path, &parent, &child, NULL);
-
-  // Did we find the specified file?
-  if(ret == 0 && child != UNALLOCATED_INODE) {
-    // Element found: read the inode
-    INODE inode;
-    if(oufs_read_inode_by_reference(child, &inode) != 0) {
-      return(-1);
-    }
-    if(debug)
-      fprintf(stderr, "\tDEBUG: Child found (type=%s).\n",  INODE_TYPE_NAME[inode.type]);
-
-    // TODO: complete implementation
-      BLOCK b;
-      memset(&b, 0, sizeof(BLOCK));
-      virtual_disk_read_block(inode.content, &b);
-      // Have the child inode
-      // check if it is a directory or a file inode
-      if (inode.type == DIRECTORY_TYPE)
-      {
-          // Don't need pointer below?? According to TA
-          qsort(b.content.directory.entry, N_DIRECTORY_ENTRIES_PER_BLOCK, sizeof(b.content.directory.entry[0]), inode_compare_to);
-          for (int i = 0; i < N_DIRECTORY_ENTRIES_PER_BLOCK; i++)
-          {
-              // May be holes in the directory. So must check whole list. Not just inode.size many
-              if (b.content.directory.entry[i].inode_reference != UNALLOCATED_INODE)
-              {
-                  // TODO: STill need to check if the entry is a directory and if so, add a / to the end
-                  // TODO: check if I can write over the inode at this point
-                  // check to see if inode_reference of the entry is a directory or not
-                  oufs_read_inode_by_reference(b.content.directory.entry[i].inode_reference, &inode);
-                  if (inode.type == DIRECTORY_TYPE)
-                  {
-                      // add a slash to the directory name
-                      printf("%s/\n", b.content.directory.entry[i].name);
-                  }
-                  else
-                  {
-                      printf("%s\n", b.content.directory.entry[i].name);
-                  }
-                      
-              }
-          }
-      }
-      else if (inode.type == FILE_TYPE)
-      {
-          for (int n = 0; n<DATA_BLOCK_SIZE; n++)
-          {
-              // data[n] is unsigned char. So i think a printf with %c should do it
-              printf("%c\n", b.content.data.data[n]);
-          }
-      }
-      else
-          return (-2);
+    INODE_REFERENCE parent;
+    INODE_REFERENCE child;
+    
+    // Look up the inodes for the parent and child
+    int ret = oufs_find_file(cwd, path, &parent, &child, NULL);
+    
+    // Did we find the specified file?
+    if(ret == 0 && child != UNALLOCATED_INODE) {
+        // Element found: read the inode
+        INODE inode;
+        if(oufs_read_inode_by_reference(child, &inode) != 0) {
+            return(-1);
+        }
+        if(debug)
+            fprintf(stderr, "\tDEBUG: Child found (type=%s).\n",  INODE_TYPE_NAME[inode.type]);
+        
+        // TODO: complete implementation
+        BLOCK b;
+        memset(&b, 0, sizeof(BLOCK));
+        virtual_disk_read_block(inode.content, &b);
+        // Have the child inode
+        // check if it is a directory or a file inode
+        if (inode.type == DIRECTORY_TYPE)
+        {
+            // Don't need pointer below?? According to TA
+            qsort(b.content.directory.entry, N_DIRECTORY_ENTRIES_PER_BLOCK, sizeof(b.content.directory.entry[0]), inode_compare_to);
+            for (int i = 0; i < N_DIRECTORY_ENTRIES_PER_BLOCK; i++)
+            {
+                // May be holes in the directory. So must check whole list. Not just inode.size many
+                if (b.content.directory.entry[i].inode_reference != UNALLOCATED_INODE)
+                {
+                    // TODO: STill need to check if the entry is a directory and if so, add a / to the end
+                    // TODO: check if I can write over the inode at this point
+                    // check to see if inode_reference of the entry is a directory or not
+                    oufs_read_inode_by_reference(b.content.directory.entry[i].inode_reference, &inode);
+                    if (inode.type == DIRECTORY_TYPE)
+                    {
+                        // add a slash to the directory name
+                        printf("%s/\n", b.content.directory.entry[i].name);
+                    }
+                    else
+                    {
+                        printf("%s\n", b.content.directory.entry[i].name);
+                    }
+                    
+                }
+            }
+        }
+        else if (inode.type == FILE_TYPE)
+        {
+            for (int n = 0; n<DATA_BLOCK_SIZE; n++)
+            {
+                // data[n] is unsigned char. So i think a printf with %c should do it
+                printf("%c\n", b.content.data.data[n]);
+            }
+        }
+        else
+            return (-2);
     }
     else
     {
@@ -328,22 +326,22 @@ int oufs_list(char *cwd, char *path)
  */
 int oufs_mkdir(char *cwd, char *path)
 {
-  INODE_REFERENCE parent;
-  INODE_REFERENCE child;
-
-  // Name of a directory within another directory
-  char local_name[MAX_PATH_LENGTH];
-  int ret;
-
-  // Attempt to find the specified directory
-  if((ret = oufs_find_file(cwd, path, &parent, &child, local_name)) < -1) {
-    if(debug)
-      fprintf(stderr, "oufs_mkdir(): ret = %d\n", ret);
-    return(-1);
-  };
+    INODE_REFERENCE parent;
+    INODE_REFERENCE child;
+    
+    // Name of a directory within another directory
+    char local_name[MAX_PATH_LENGTH];
+    int ret;
+    
+    // Attempt to find the specified directory
+    if((ret = oufs_find_file(cwd, path, &parent, &child, local_name)) < -1) {
+        if(debug)
+            fprintf(stderr, "oufs_mkdir(): ret = %d\n", ret);
+        return(-1);
+    };
     // CHILD MUST NOT EXIST!??!
-  // TODO: complete implementation
-
+    // TODO: complete implementation
+    
     
     // parent inode and block
     INODE parentinode;
@@ -367,14 +365,14 @@ int oufs_mkdir(char *cwd, char *path)
         }
         fprintf(stderr, "end strtok loop in mkdir line 384");
     }
-                    /*
-    // get child block to get name to store in parent directory
-    INODE cnode;
-    oufs_read_inode_by_reference(child, &cnode);
-    BLOCK cblock;
-    virtual_disk_read_block(cnode.content, &cblock);
-    cblock.content.directory.entry[.name
-                                   */
+    /*
+     // get child block to get name to store in parent directory
+     INODE cnode;
+     oufs_read_inode_by_reference(child, &cnode);
+     BLOCK cblock;
+     virtual_disk_read_block(cnode.content, &cblock);
+     cblock.content.directory.entry[.name
+     */
     
     // add to parent directory and increment size
     
@@ -386,7 +384,6 @@ int oufs_mkdir(char *cwd, char *path)
             child = oufs_allocate_new_directory(parent);
             if (child == UNALLOCATED_INODE)
             {
-                fprintf(stderr, "local name = %s\n", local_name);
                 fprintf(stderr, "oufs_mkdir(): got UNALLOCATED_INODE calling allocate_new_dir");
                 return (-3);
             }
@@ -402,9 +399,9 @@ int oufs_mkdir(char *cwd, char *path)
             return 0;
         }
     }
-        // no space to store directory if it hits this point
-        fprintf(stderr, "No space in directory to store new entry");
-        return (-2);
+    // no space to store directory if it hits this point
+    fprintf(stderr, "No space in directory to store new entry");
+    return (-2);
 }
 
 /**
@@ -423,18 +420,18 @@ int oufs_mkdir(char *cwd, char *path)
  */
 int oufs_rmdir(char *cwd, char *path)
 {
-  INODE_REFERENCE parent;
-  INODE_REFERENCE child;
-  char local_name[MAX_PATH_LENGTH];
-
-  // Try to find the inode of the child
-  if(oufs_find_file(cwd, path, &parent, &child, local_name) < -1) {
-    return(-4);
-  }
-
-  // TODO: complet implementation
-
-
-  // Success
-  return(0);
+    INODE_REFERENCE parent;
+    INODE_REFERENCE child;
+    char local_name[MAX_PATH_LENGTH];
+    
+    // Try to find the inode of the child
+    if(oufs_find_file(cwd, path, &parent, &child, local_name) < -1) {
+        return(-4);
+    }
+    
+    // TODO: complet implementation
+    
+    
+    // Success
+    return(0);
 }

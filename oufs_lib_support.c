@@ -19,7 +19,7 @@ extern int debug;
  * - Add the specified block to THE END of the free block linked list
  * - Modify the disk copy of the deallocated block: next_block points to
  *     UNALLOCATED_BLOCK
- *   
+ *
  *
  * @param master_block Pointer to a loaded master block.  Changes to the MB will
  *           be made here, but not written to disk
@@ -29,34 +29,34 @@ extern int debug;
  */
 int oufs_deallocate_block(BLOCK *master_block, BLOCK_REFERENCE block_reference)
 {
-  BLOCK b;
-
-  if(master_block->content.master.unallocated_front == UNALLOCATED_BLOCK) {
-    // No blocks on the free list.  Both pointers point to this block now
-    master_block->content.master.unallocated_front = master_block->content.master.unallocated_end =
-      block_reference;
-
-  }else{
-    // TODO
-      
-  }
-
-  // Update the new end block
-  if(virtual_disk_read_block(block_reference, &b) != 0) {
-    fprintf(stderr, "deallocate_block: error reading new end block\n");
-    return(-1);
-  }
-
-  // Change the new end block to point to nowhere
-  b.next_block = UNALLOCATED_BLOCK;
-
-  // Write the block back
-  if(virtual_disk_write_block(block_reference, &b) != 0) {
-    fprintf(stderr, "deallocate_block: error writing new end block\n");
-    return(-1);
-  }
-
-  return(0);
+    BLOCK b;
+    
+    if(master_block->content.master.unallocated_front == UNALLOCATED_BLOCK) {
+        // No blocks on the free list.  Both pointers point to this block now
+        master_block->content.master.unallocated_front = master_block->content.master.unallocated_end =
+        block_reference;
+        
+    }else{
+        // TODO
+        
+    }
+    
+    // Update the new end block
+    if(virtual_disk_read_block(block_reference, &b) != 0) {
+        fprintf(stderr, "deallocate_block: error reading new end block\n");
+        return(-1);
+    }
+    
+    // Change the new end block to point to nowhere
+    b.next_block = UNALLOCATED_BLOCK;
+    
+    // Write the block back
+    if(virtual_disk_write_block(block_reference, &b) != 0) {
+        fprintf(stderr, "deallocate_block: error writing new end block\n");
+        return(-1);
+    }
+    
+    return(0);
 };
 
 
@@ -74,9 +74,9 @@ int oufs_deallocate_block(BLOCK *master_block, BLOCK_REFERENCE block_reference)
  * @param parent_inode_reference The inode reference to the parent inode
  */
 void oufs_init_directory_structures(INODE *inode, BLOCK *block,
-				    BLOCK_REFERENCE self_block_reference,
-				    INODE_REFERENCE self_inode_reference,
-				    INODE_REFERENCE parent_inode_reference)
+                                    BLOCK_REFERENCE self_block_reference,
+                                    INODE_REFERENCE self_inode_reference,
+                                    INODE_REFERENCE parent_inode_reference)
 {
     // set up Inode
     inode->type = DIRECTORY_TYPE;
@@ -114,22 +114,22 @@ void oufs_init_directory_structures(INODE *inode, BLOCK *block,
  */
 int oufs_read_inode_by_reference(INODE_REFERENCE i, INODE *inode)
 {
-  if(debug)
-    fprintf(stderr, "\tDEBUG: Fetching inode %d\n", i);
-
-  // Find the address of the inode block and the inode within the block
-  BLOCK_REFERENCE block = i / N_INODES_PER_BLOCK + 1;
-  int element = (i % N_INODES_PER_BLOCK);
-
-  // Load the block that contains the inode
-  BLOCK b;
-  if(virtual_disk_read_block(block, &b) == 0) {
-    // Successfully loaded the block: copy just this inode
-    *inode = b.content.inodes.inode[element];
-    return(0);
-  }
-  // Error case
-  return(-1);
+    if(debug)
+        fprintf(stderr, "\tDEBUG: Fetching inode %d\n", i);
+    
+    // Find the address of the inode block and the inode within the block
+    BLOCK_REFERENCE block = i / N_INODES_PER_BLOCK + 1;
+    int element = (i % N_INODES_PER_BLOCK);
+    
+    // Load the block that contains the inode
+    BLOCK b;
+    if(virtual_disk_read_block(block, &b) == 0) {
+        // Successfully loaded the block: copy just this inode
+        *inode = b.content.inodes.inode[element];
+        return(0);
+    }
+    // Error case
+    return(-1);
 }
 
 
@@ -144,8 +144,8 @@ int oufs_read_inode_by_reference(INODE_REFERENCE i, INODE *inode)
  */
 int oufs_write_inode_by_reference(INODE_REFERENCE i, INODE *inode)
 {
-  if(debug)
-    fprintf(stderr, "\tDEBUG: Writing inode %d\n", i);
+    if(debug)
+        fprintf(stderr, "\tDEBUG: Writing inode %d\n", i);
     
     // TODO:
     BLOCK_REFERENCE b = i / N_INODES_PER_BLOCK + 1;     // add one to account for master block I think
@@ -154,21 +154,21 @@ int oufs_write_inode_by_reference(INODE_REFERENCE i, INODE *inode)
     BLOCK tempBlock;
     memset(&tempBlock, 0, BLOCK_SIZE);
     // read the block from disk to tempBlock
-     if(virtual_disk_read_block(b, &tempBlock) != 0) {
-         fprintf(stderr, "deallocate_block: error reading inode block\n");
-         return(-1);
-     }
+    if(virtual_disk_read_block(b, &tempBlock) != 0) {
+        fprintf(stderr, "deallocate_block: error reading inode block\n");
+        return(-1);
+    }
     // set tempBlock's inode to the input inode
     tempBlock.content.inodes.inode[element] = *inode;
-                             
-     // Write the block back
-     if(virtual_disk_write_block(b, &tempBlock) != 0) {
-         fprintf(stderr, "deallocate_block: error writing inode block\n");
-         return(-1);
-     }
-                             
-  // Success
-  return(0);
+    
+    // Write the block back
+    if(virtual_disk_write_block(b, &tempBlock) != 0) {
+        fprintf(stderr, "deallocate_block: error writing inode block\n");
+        return(-1);
+    }
+    
+    // Success
+    return(0);
 }
 
 /**
@@ -184,12 +184,12 @@ int oufs_write_inode_by_reference(INODE_REFERENCE i, INODE *inode)
  */
 
 void oufs_set_inode(INODE *inode, INODE_TYPE type, int n_references,
-		    BLOCK_REFERENCE content, int size)
+                    BLOCK_REFERENCE content, int size)
 {
-  inode->type = type;
-  inode->n_references = n_references;
-  inode->content = content;
-  inode->size = size;
+    inode->type = type;
+    inode->n_references = n_references;
+    inode->content = content;
+    inode->size = size;
 }
 
 
@@ -205,10 +205,10 @@ void oufs_set_inode(INODE *inode, INODE_TYPE type, int n_references,
 
 int oufs_find_directory_element(INODE *inode, char *element_name)
 {
-  if(debug)
-    fprintf(stderr,"\tDEBUG: oufs_find_directory_element: %s\n", element_name);
-
-  // TODO
+    if(debug)
+        fprintf(stderr,"\tDEBUG: oufs_find_directory_element: %s\n", element_name);
+    
+    // TODO
     // TODO: should I return -1 for its "must be directory inode" if not directory inode??
     if (inode->type == DIRECTORY_TYPE)
     {
@@ -247,87 +247,85 @@ int oufs_find_directory_element(INODE *inode, char *element_name)
  *
  */
 int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERENCE *child,
-		   char *local_name)
+                   char *local_name)
 {
-  INODE_REFERENCE grandparent;
-  char full_path[MAX_PATH_LENGTH];
-
-  // Construct an absolute path for the file/directory in question
-  if(path[0] == '/') {
-    strncpy(full_path, path, MAX_PATH_LENGTH-1);
-  }else{    // path is a relative path
-    if(strlen(cwd) > 1) {
-      strncpy(full_path, cwd, MAX_PATH_LENGTH-1);
-      strncat(full_path, "/", 2);
-      strncat(full_path, path, MAX_PATH_LENGTH-1-strnlen(full_path, MAX_PATH_LENGTH));
-    }else{
-      strncpy(full_path, "/", 2);
-      strncat(full_path, path, MAX_PATH_LENGTH-2);
+    INODE_REFERENCE grandparent;
+    char full_path[MAX_PATH_LENGTH];
+    
+    // Construct an absolute path for the file/directory in question
+    if(path[0] == '/') {
+        strncpy(full_path, path, MAX_PATH_LENGTH-1);
+    }else{    // path is a relative path
+        if(strlen(cwd) > 1) {
+            strncpy(full_path, cwd, MAX_PATH_LENGTH-1);
+            strncat(full_path, "/", 2);
+            strncat(full_path, path, MAX_PATH_LENGTH-1-strnlen(full_path, MAX_PATH_LENGTH));
+        }else{
+            strncpy(full_path, "/", 2);
+            strncat(full_path, path, MAX_PATH_LENGTH-2);
+        }
     }
-  }
-
-  if(debug) {
-    fprintf(stderr, "\tDEBUG: Full path: %s\n", full_path);
-  };
-
-  // Start scanning from the root directory
-  grandparent = *parent = *child = 0;
-  if(debug)
-    fprintf(stderr, "\tDEBUG: Start search: %d\n", *parent);
-
-  // Parse the full path
-  char *directory_name;
-  directory_name = strtok(full_path, "/");
-  while(directory_name != NULL) {
-    if(strlen(directory_name) >= FILE_NAME_SIZE-1) 
-      // Truncate the name
-      directory_name[FILE_NAME_SIZE - 1] = 0;
-    if(debug){
-      fprintf(stderr, "\tDEBUG: Directory: %s\n", directory_name);
+    
+    if(debug) {
+        fprintf(stderr, "\tDEBUG: Full path: %s\n", full_path);
+    };
+    
+    // Start scanning from the root directory
+    grandparent = *parent = *child = 0;
+    if(debug)
+        fprintf(stderr, "\tDEBUG: Start search: %d\n", *parent);
+    
+    // Parse the full path
+    char *directory_name;
+    directory_name = strtok(full_path, "/");
+    while(directory_name != NULL) {
+        if(strlen(directory_name) >= FILE_NAME_SIZE-1)
+            // Truncate the name
+            directory_name[FILE_NAME_SIZE - 1] = 0;
+        if(debug){
+            fprintf(stderr, "\tDEBUG: Directory: %s\n", directory_name);
+        }
+        // TODO: finish
+        
+        INODE start;
+        BLOCK b;
+        memset(&b, 0, sizeof(BLOCK));
+        oufs_read_inode_by_reference(*child, &start);
+        INODE_REFERENCE temp = (INODE_REFERENCE)oufs_find_directory_element(&start, directory_name);
+        if ((int)temp == -1)
+        {
+            // inode is a file
+            // TODO: find out if this shit is correct or not
+            //fprintf(stderr, "%s\n", "This is a file not a directory");
+        }
+        else if (temp != UNALLOCATED_INODE)
+        {
+            //found subdirectory
+            grandparent = *parent;
+            *parent = *child;
+            directory_name = strtok(NULL, "/");
+        }
+        else
+        {
+            //unallocated inode
+            return (-1);
+        }
+        
+        *child = temp;
+    };
+    
+    // Item found.
+    if(*child == UNALLOCATED_INODE) {
+        // We went too far - roll back one step ***
+        *child = *parent;
+        *parent = grandparent;
     }
-      // TODO: finish
-      
-      INODE start;
-      BLOCK b;
-      memset(&b, 0, sizeof(BLOCK));
-      oufs_read_inode_by_reference(*child, &start);
-          INODE_REFERENCE temp = (INODE_REFERENCE)oufs_find_directory_element(&start, directory_name);
-            if ((int)temp == -1)
-          {
-              // inode is a file
-              // TODO: find out if this shit is correct or not
-              fprintf(stderr, "%s\n", "This is a file not a directory");
-          }
-          else if (temp != UNALLOCATED_INODE)
-          {
-              //found subdirectory
-              grandparent = *parent;
-              *parent = *child;
-              strcpy(local_name, directory_name);
-              fprintf(stderr, "directory_name= %s \n", directory_name);
-              directory_name = strtok(NULL, "/");
-          }
-          else
-          {
-              //unallocated inode
-              return (-1);
-          }
-      
-      *child = temp;
-  };
-
-  // Item found.
-  if(*child == UNALLOCATED_INODE) {
-    // We went too far - roll back one step ***
-    *child = *parent;
-    *parent = grandparent;
-  }
-  if(debug) {
-    fprintf(stderr, "\tDEBUG: Found: parent %d, child %d\n", *parent, *child);
-  }
-  // Success!
-  return(0);
-} 
+    if(debug) {
+        fprintf(stderr, "\tDEBUG: Found: parent %d, child %d\n", *parent, *child);
+    }
+    // Success!
+    return(0);
+}
 
 
 /**
@@ -341,13 +339,13 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
 
 int oufs_find_open_bit(unsigned char value)
 {
-  // TODO
+    // TODO
+    
+    
     //fprintf(stderr, "inside oufs_find_open_bit 357");
     // handle no bits available
-    fprintf(stderr, "XOR value = %c\n", value);
     if ((value ^ 0xFF) == 0x00)
     {
-        fprintf(stderr, "XOR value = %c\n", value);
         return -1;
     }
     // handle all bits available
@@ -355,16 +353,14 @@ int oufs_find_open_bit(unsigned char value)
     {
         for (int i=0; i<7; i++)
         {
-            fprintf(stderr, "checking bit %d\n", i);
             if(value & (1<<i)==0)
             {
                 return i;
             }
         }
     }
-  // Not found
-    fprintf(stderr, "didn't find any open bits \n");
-  return(-1);
+    // Not found
+    return(-1);
 }
 
 /**
@@ -377,14 +373,14 @@ int oufs_find_open_bit(unsigned char value)
  */
 int oufs_allocate_new_directory(INODE_REFERENCE parent_reference)
 {
-  BLOCK block;
-  BLOCK block2;
-  // Read the master block
-  if(virtual_disk_read_block(MASTER_BLOCK_REFERENCE, &block) != 0) {
-    // Read error
-    return(UNALLOCATED_INODE);
-  }
-  // TODO
+    BLOCK block;
+    BLOCK block2;
+    // Read the master block
+    if(virtual_disk_read_block(MASTER_BLOCK_REFERENCE, &block) != 0) {
+        // Read error
+        return(UNALLOCATED_INODE);
+    }
+    // TODO
     INODE_REFERENCE newdir = UNALLOCATED_INODE;
     int byte = -1;
     int bit = -1;
@@ -393,9 +389,9 @@ int oufs_allocate_new_directory(INODE_REFERENCE parent_reference)
         // TODO: double check all this
         byte = i/8;
         // TODO: must make sure find_open_bit works for this function to work
-        fprintf(stderr, "block.content.master.inode_allocated_flag[byte] is %c\n", block.content.master.inode_allocated_flag[byte]);
+        fprintf(stderr, "before find_open_bit in allocate_new_dir line 403");
         bit = oufs_find_open_bit(block.content.master.inode_allocated_flag[byte]);
-        fprintf(stderr, "bit number is %d \n", bit);
+        fprintf(stderr, "after find_open_bit in allocate_new_dir line 405");
         if (bit != -1)
         {
             // INODE REFERENCE may be j*8 + (7-i)
@@ -407,10 +403,7 @@ int oufs_allocate_new_directory(INODE_REFERENCE parent_reference)
     }
     // couldn't find an open bit
     if (bit == -1)
-    {
-        
         return UNALLOCATED_INODE;
-    }
     // change allocation table to mark new one being allocated
     
     INODE inode;
