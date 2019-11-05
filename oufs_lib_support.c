@@ -346,6 +346,7 @@ int oufs_find_open_bit(unsigned char value)
     // handle no bits available
     if ((value ^ 0xFF) == 0x00)
     {
+        fprintf(stderr, "XOR value = %c\n", value);
         return -1;
     }
     // handle all bits available
@@ -353,6 +354,7 @@ int oufs_find_open_bit(unsigned char value)
     {
         for (int i=0; i<7; i++)
         {
+            fprintf(stderr, "checking bit %d\n", i);
             if(value & (1<<i)==0)
             {
                 return i;
@@ -360,6 +362,7 @@ int oufs_find_open_bit(unsigned char value)
         }
     }
   // Not found
+    fprintf(stderr, "didn't find any open bits \n");
   return(-1);
 }
 
