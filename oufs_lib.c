@@ -347,7 +347,6 @@ int oufs_mkdir(char *cwd, char *path)
     
     // parent inode and block
     INODE parentinode;
-    fprintf(stderr, "mkdir line 350");
     oufs_read_inode_by_reference(parent, &parentinode);
     
     BLOCK pblock;
@@ -355,24 +354,8 @@ int oufs_mkdir(char *cwd, char *path)
     virtual_disk_read_block(parentinode.content, &pblock);
     
     
-                        /*
-    INODE_REFERENCE grandParent = pblock.content.directory.entry[1].inode_reference;
-    INODE gParentinode;
-    oufs_read_inode_by_reference(grandParent, &gParentinode);
-    BLOCK gPblock;
-    virtual_disk_read_block(gParentinode.content, &gPblock);
     
-    char* parentName;
-    for(int i =2; i <N_DIRECTORY_ENTRIES_PER_BLOCK; i++)
-    {
-        if(gPblock.content.directory.entry[i].inode_reference== parent)
-        {
-            strcpy(gPblock.content.directory.entry[i].name, parentName);
-            break;
-        }
-    }
-                         */
-    
+    // TODO: Local_name should be being set inside find_file() and should be checked to not already exist
     char* current= strtok(path, "/");
     char* dir;
     while(current!= NULL)
@@ -400,7 +383,6 @@ int oufs_mkdir(char *cwd, char *path)
     {
         if (pblock.content.directory.entry[i].inode_reference == UNALLOCATED_INODE)
         {
-            fprintf(stderr, "inside for loop of mkdir line 401");
             child = oufs_allocate_new_directory(parent);
             if (child == UNALLOCATED_INODE)
             {
@@ -411,7 +393,7 @@ int oufs_mkdir(char *cwd, char *path)
             pblock.content.directory.entry[i].inode_reference =  child;// insert new inode ref
             // TODO: make sure this strcpy is correct and will work
             
-            strcpy(pblock.content.directory.entry[i].name, dir);
+            strcpy(pblock.content.directory.entry[i].name, local_name);
             parentinode.size++;
             // write parent directory block and inode back to disk
             virtual_disk_write_block(parentinode.content, &pblock);
