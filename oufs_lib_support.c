@@ -387,6 +387,8 @@ int oufs_allocate_new_directory(INODE_REFERENCE parent_reference)
     INODE_REFERENCE newdir = UNALLOCATED_INODE;
     int byte = -1;
     int bit = -1;
+    
+    //FIXME: this looping is wrong. uses already used inodes
     for (int i=0; i<N_INODES; i++)
     {
         // TODO: double check all this
@@ -398,7 +400,7 @@ int oufs_allocate_new_directory(INODE_REFERENCE parent_reference)
         if (bit != -1)
         {
             // INODE REFERENCE may be j*8 + (7-i)
-            newdir = (INODE_REFERENCE)i;
+            newdir = (INODE_REFERENCE)((7-bit) +(i));
             fprintf(stderr, "\n i is %d \n", i);
             fprintf(stderr, "\n newdir is %d \n", newdir);
             // TODO: make sure this shift works correctly
