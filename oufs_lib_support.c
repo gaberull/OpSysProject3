@@ -341,23 +341,8 @@ int oufs_find_open_bit(unsigned char value)
 {
   // TODO
     
-                            /*
-    int position = 7;
-    int next = 1;
-    next = next << 7;
-    // using AND operation
-    while (value & next)
-    {
-        next = next >> 1;
-        position--;
-    }
-    return position;
-                             */
     
-    fprintf(stderr, "inside oufs_find_open_bit 357");
-    // ones should be 1111 1111
-    //unsigned char ones = ~0u;
-    //unsigned char ones = 0xFF;
+    //fprintf(stderr, "inside oufs_find_open_bit 357");
     // handle no bits available
     if ((value ^ 0xFF) == 0x00)
     {
@@ -372,27 +357,11 @@ int oufs_find_open_bit(unsigned char value)
     {
         for (int i=0; i<6; i++)
         {
-            value = (value & (1<<i));
-            if (value == 0x00)
+            if(value & (1<<i)==0)
+            {
                 return i;
+            }
         }
-        
-        
-        
-        
-                                                /*
-        
-        // open bit must be between 0 and 6
-        int count = -1;
-        while (value != 0xFF)
-        {
-            value = (value >> 1);
-            value = (value | 0x80);
-            count++;
-            fprintf(stderr, "inside while loop of oufs_find_open_bit 378");
-        }
-        return count;
-                                                 */
     }
   // Not found
   return(-1);
@@ -421,6 +390,7 @@ int oufs_allocate_new_directory(INODE_REFERENCE parent_reference)
     int bit = -1;
     for (int i=0; i<N_INODES; i++)
     {
+        // TODO: double check all this
         byte = i/8;
         // TODO: must make sure find_open_bit works for this function to work
         fprintf(stderr, "before find_open_bit in allocate_new_dir line 403");
@@ -428,7 +398,10 @@ int oufs_allocate_new_directory(INODE_REFERENCE parent_reference)
         fprintf(stderr, "after find_open_bit in allocate_new_dir line 405");
         if (bit != -1)
         {
+            // INODE REFERENCE may be j*8 + (7-i)
             newdir = (INODE_REFERENCE)i;
+            // TODO: make sure this shift works correctly
+            block.content.master.inode_allocated_flag[byte] = (block.content.master.inode_allocated_flag[byte] | (1<<bit) );
             break;
         }
     }
@@ -436,7 +409,7 @@ int oufs_allocate_new_directory(INODE_REFERENCE parent_reference)
     if (bit == -1)
         return UNALLOCATED_INODE;
     // change allocation table to mark new one being allocated
-    block.content.master.inode_allocated_flag[byte] = block.content.master.inode_allocated_flag[byte] >>1;
+    
     INODE inode;
     // read the inode from virtual disk TODO: need this??
     oufs_read_inode_by_reference(newdir, &inode);
@@ -463,7 +436,6 @@ int oufs_allocate_new_directory(INODE_REFERENCE parent_reference)
     //  changed allocation table. write master block back to disk
     virtual_disk_write_block(MASTER_BLOCK_REFERENCE, &block);
     virtual_disk_write_block(temp, &block2); // TODO: changed to temp from inode.content. Check this
-    fprintf(stderr, "end of allocate_new_dir line 441");
     return newdir;
     
 };
