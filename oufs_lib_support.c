@@ -353,7 +353,7 @@ int oufs_find_open_bit(unsigned char value)
     {
         for (int i=0; i<7; i++)
         {
-            if(value & (1<<i)==0)
+            if((value & (1<<i))==0)
             {
                 return i;
             }
