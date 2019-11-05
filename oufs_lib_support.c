@@ -380,7 +380,7 @@ int oufs_allocate_new_directory(INODE_REFERENCE parent_reference)
     return(UNALLOCATED_INODE);
   }
   // TODO
-    INODE_REFERENCE newdir = UNALLOCATED_INODE;1000
+    INODE_REFERENCE newdir = UNALLOCATED_INODE;
     int byte = -1;
     int bit = -1;
     for (int i=0; i<N_INODES; i++)
