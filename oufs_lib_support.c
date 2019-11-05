@@ -303,6 +303,7 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
               //found subdirectory
               grandparent = *parent;
               *parent = *child;
+              strcpy(local_name, directory_name);
               directory_name = strtok(NULL, "/");
           }
           else
@@ -340,8 +341,6 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
 int oufs_find_open_bit(unsigned char value)
 {
   // TODO
-    
-    
     //fprintf(stderr, "inside oufs_find_open_bit 357");
     // handle no bits available
     if ((value ^ 0xFF) == 0x00)
