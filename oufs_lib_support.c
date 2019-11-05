@@ -399,6 +399,8 @@ int oufs_allocate_new_directory(INODE_REFERENCE parent_reference)
         {
             // INODE REFERENCE may be j*8 + (7-i)
             newdir = (INODE_REFERENCE)i;
+            fprintf(stderr, "\n i is %d \n", i);
+            fprintf(stderr, "\n newdir is %d \n", newdir);
             // TODO: make sure this shift works correctly
             
             block.content.master.inode_allocated_flag[byte] = (block.content.master.inode_allocated_flag[byte] | (1<<bit) );
