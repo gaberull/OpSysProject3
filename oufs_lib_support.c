@@ -303,6 +303,7 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
             //found subdirectory
             grandparent = *parent;
             *parent = *child;
+            strcpy(local_name, directory_name);
             directory_name = strtok(NULL, "/");
         }
         else
