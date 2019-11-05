@@ -390,6 +390,7 @@ int oufs_allocate_new_directory(INODE_REFERENCE parent_reference)
         byte = i/8;
         // TODO: must make sure find_open_bit works for this function to work
         bit = oufs_find_open_bit(block.content.master.inode_allocated_flag[byte]);
+        fprintf(stderr, "bit number is %d \n", bit);
         if (bit != -1)
         {
             // INODE REFERENCE may be j*8 + (7-i)
@@ -402,7 +403,7 @@ int oufs_allocate_new_directory(INODE_REFERENCE parent_reference)
     // couldn't find an open bit
     if (bit == -1)
     {
-        fprintf(stderr, "bit number is %d \n", bit);
+        
         return UNALLOCATED_INODE;
     }
     // change allocation table to mark new one being allocated
