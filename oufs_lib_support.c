@@ -344,6 +344,7 @@ int oufs_find_open_bit(unsigned char value)
   // TODO
     //fprintf(stderr, "inside oufs_find_open_bit 357");
     // handle no bits available
+    fprintf(stderr, "XOR value = %c\n", value);
     if ((value ^ 0xFF) == 0x00)
     {
         fprintf(stderr, "XOR value = %c\n", value);
