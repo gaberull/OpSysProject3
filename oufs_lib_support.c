@@ -283,7 +283,7 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
             // Truncate the name
             directory_name[FILE_NAME_SIZE - 1] = 0;
         if(debug){
-            fprintf(stderr, "\tDEBUG: Directory: %s\n", directory_name);
+            fprintf(stderr, "\tDEBUG: Searching Directory: %s\n", directory_name);
         }
         // TODO: finish
         
@@ -299,9 +299,10 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
         }
         else if (temp != UNALLOCATED_INODE) 
         {
-            fprintf(stderr, "\tFound directory, beginning new search\n");
+            fprintf(stderr, "\tFound directory\n");
             //found subdirectory
             grandparent = *parent;
+            fprintf(stderr, "\tParent inode was %d next round will be %d\n", *parent, *child);
             *parent = *child;
             //strcpy(local_name, directory_name);
             directory_name = strtok(NULL, "/");
