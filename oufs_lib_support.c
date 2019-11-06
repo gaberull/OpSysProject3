@@ -428,13 +428,16 @@ int oufs_allocate_new_directory(INODE_REFERENCE parent_reference)
     // using a temporary variable for the block at front of list
     BLOCK_REFERENCE temp = block.content.master.unallocated_front;
     if (temp == UNALLOCATED_BLOCK)
+    {
+        fprintf(stderr, "\n unallocated_front was an unallocated block. \n");
         return UNALLOCATED_INODE;
+    }
     virtual_disk_read_block(temp, &block2);
     
     //TODO: set the end of the chain to UNALLOCATED IF NONE LEFT
     if (block2.next_block == UNALLOCATED_BLOCK)
     {
-        block.content.master.unallocated_front = block.content.master.unallocated_end = UNALLOCATED_BLOCK;
+        block.content.master.unallocated_front = UNALLOCATED_BLOCK;
     }
     else        // TODO: double check this logic
     {

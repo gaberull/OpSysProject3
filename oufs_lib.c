@@ -352,32 +352,6 @@ int oufs_mkdir(char *cwd, char *path)
     virtual_disk_read_block(parentinode.content, &pblock);
     
     
-    
-    // TODO: Local_name should be being set inside find_file() and should be checked to not already exist
-    
-                                            /*
-    char* current= strtok(path, "/");
-    char* dir;
-    while(current!= NULL)
-    {
-        current= strtok(NULL, "/");
-        if(current!=NULL)
-        {
-            dir=current;
-        }
-        fprintf(stderr, "end strtok loop in mkdir line 384");
-    }
-                                             */
-    
-    /*
-     // get child block to get name to store in parent directory
-     INODE cnode;
-     oufs_read_inode_by_reference(child, &cnode);
-     BLOCK cblock;
-     virtual_disk_read_block(cnode.content, &cblock);
-     cblock.content.directory.entry[.name
-     */
-    
     // add to parent directory and increment size
     
     // TODO: he says add it to first AVAILABLE ENTRY?????
@@ -385,6 +359,7 @@ int oufs_mkdir(char *cwd, char *path)
     {
         if (pblock.content.directory.entry[i].inode_reference == UNALLOCATED_INODE)
         {
+            fprintf(stderr, "allocating directory on inode: %d\n", parent);
             child = oufs_allocate_new_directory(parent);
             if (child == UNALLOCATED_INODE)
             {
