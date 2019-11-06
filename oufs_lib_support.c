@@ -37,9 +37,24 @@ int oufs_deallocate_block(BLOCK *master_block, BLOCK_REFERENCE block_reference)
         block_reference;
         
     }else{
-        // TODO
+        BLOCK prevEndBlock;
+        BLOCK_REFERENCE prevEnd = master_block->content.master.unallocated_end;
+        if(virtual_disk_read_block(prevEnd, &prevEndBlock) != 0) {
+            fprintf(stderr, "deallocate_block: error reading old end block\n");
+            return(-1);
+        }
         
+        prevEndBlock.next_block = block_reference;
+        
+        if(virtual_disk_write_block(prevEnd, &prevEndBlock) != 0) {
+            fprintf(stderr, "deallocate_block: error writing old end block\n");
+            return(-1);
+        }
+        
+        master_block->content.master.unallocated_end = block_reference;
     }
+    
+    //add block back to unallocated block list
     
     // Update the new end block
     if(virtual_disk_read_block(block_reference, &b) != 0) {
@@ -311,6 +326,7 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
         {
            fprintf(stderr,"\tDirectory not found, setting local_name\n");
             //unallocated inode
+            *child=UNALLOCATED_INODE;
             if(local_name!=NULL)
                 strcpy(local_name, directory_name);
             return (-1);

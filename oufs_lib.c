@@ -404,9 +404,17 @@ int oufs_rmdir(char *cwd, char *path)
     char local_name[MAX_PATH_LENGTH];
     
     // Try to find the inode of the child
-    if(oufs_find_file(cwd, path, &parent, &child, local_name) < -1) {
+    int result = oufs_find_file(cwd, path, &parent, &child, local_name);
+    if(result < -1) {
         return(-4);
     }
+    else if (result==-1)
+    {
+        return -1;
+    }
+    
+    
+    
     
     // TODO: complet implementation
     
