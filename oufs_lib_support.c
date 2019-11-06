@@ -295,10 +295,9 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
         if ((int)temp == -1)
         {
             // inode is a file
-            // TODO: find out if this shit is correct or not
             //fprintf(stderr, "%s\n", "This is a file not a directory");
         }
-        else if (temp != UNALLOCATED_INODE)
+        else if (temp != UNALLOCATED_INODE) 
         {
             //found subdirectory
             grandparent = *parent;
@@ -317,11 +316,15 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
     };
     
     // Item found.
+    
+    // Dr. FAGG says this is code is for handling cases like /foo/bar//baz/// pretend it is not here
+                                /*
     if(*child == UNALLOCATED_INODE) {
         // We went too far - roll back one step ***
         *child = *parent;
         *parent = grandparent;
     }
+                                */
     if(debug) {
         fprintf(stderr, "\tDEBUG: Found: parent %d, child %d\n", *parent, *child);
     }

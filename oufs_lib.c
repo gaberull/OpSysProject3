@@ -342,7 +342,7 @@ int oufs_mkdir(char *cwd, char *path)
     // CHILD MUST NOT EXIST!??!
     // TODO: complete implementation
     
-    
+    fprintf(stderr, "\nlocal_name is  = %s\n", local_name);
     // parent inode and block
     INODE parentinode;
     oufs_read_inode_by_reference(parent, &parentinode);
