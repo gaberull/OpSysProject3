@@ -295,10 +295,11 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
         if ((int)temp == -1)
         {
             // inode is a file
-            //fprintf(stderr, "%s\n", "This is a file not a directory");
+            fprintf(stderr, "This is a file not a directory");
         }
         else if (temp != UNALLOCATED_INODE) 
         {
+            fprintf(stderr, "Found directory, beginning new search");
             //found subdirectory
             grandparent = *parent;
             *parent = *child;
@@ -307,6 +308,7 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
         }
         else
         {
+         fprintf(stderr, "Found unallocated node, setting local_name");
             //unallocated inode
             strcpy(local_name, directory_name);
             return (-1);
