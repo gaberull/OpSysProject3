@@ -459,6 +459,7 @@ int oufs_rmdir(char *cwd, char *path)
         {
             directory.content.directory.entry[i].inode_reference = UNALLOCATED_INODE;
             // TODO: do i need to remove the name??
+            cnode.size--;
             break;
         }
     }
@@ -470,7 +471,7 @@ int oufs_rmdir(char *cwd, char *path)
     fprintf(stderr, "byte %d bit %d\n", byte, bit);
     master.content.master.inode_allocated_flag[byte] = master.content.master.inode_allocated_flag[byte] ^ (1<<bit);
     
-    cnode.size--;
+    
     //if(cnode.size==2)
     //    cnode.type= UNUSED_TYPE;
 
