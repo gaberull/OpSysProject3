@@ -68,6 +68,10 @@ int oufs_deallocate_block(BLOCK *master_block, BLOCK_REFERENCE block_reference)
     
     // Change the new end block to point to nowhere
     b.next_block = UNALLOCATED_BLOCK;
+    for (int i=0; i<N_DIRECTORY_ENTRIES_PER_BLOCK; i++)
+    {
+        b.content.directory.entry[i].inode_reference = UNALLOCATED_INODE;
+    }
     
     // Write the block back
     if(virtual_disk_write_block(block_reference, &b) != 0) {
