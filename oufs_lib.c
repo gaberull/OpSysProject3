@@ -420,9 +420,26 @@ int oufs_rmdir(char *cwd, char *path)
     INODE pnode;
     oufs_read_inode_by_reference(parent, &pnode);
     // error if type isn't directory type
-    if (pnode.type != DIRECTORY_TYPE)
+    INODE cnode;
+    oufs_read_inode_by_reference(child, &cnode);
+    if (cnode.type != DIRECTORY_TYPE)
     {
         return -2;
+    }
+    BLOCK childdirectory;
+    virtual_disk_read_block(cnode.content, &childdirectory);
+    int count = 0;
+    for (int i=0; i<N_DIRECTORY_ENTRIES_PER_BLOCK; i++)
+    {
+        if (childdirectory.content.directory.entry[i].inode_reference != UNALLOCATED_INODE)
+        {
+            count++;
+        }
+    }
+    if (count > 2)
+    {
+        fprintf(stderr, "trying to remove non-empty directory\n");
+        return -3;
     }
     // check to make sure name is not . or ..
     if (strcmp(local_name, ".") == 0)
@@ -432,21 +449,8 @@ int oufs_rmdir(char *cwd, char *path)
     
     BLOCK directory;
     virtual_disk_read_block(pnode.content, &directory);
-    // check directory's contents to make sure only 2 there
-    int count = 0;
-    for (int i=0; i<N_DIRECTORY_ENTRIES_PER_BLOCK; i++)
-    {
-        if (directory.content.directory.entry[i].inode_reference != UNALLOCATED_INODE)
-        {
-            count++;
-        }
-    }
-    if (count > 2)
-    {
-        //directory is not an empty directory (size of 2)
-        fprintf(stderr, "trying to remove non-empty directory\n");
-        return -2;
-    }
+    
+    
     // TODO: check this this. seems weird
     for (int i=0; i<N_DIRECTORY_ENTRIES_PER_BLOCK; i++)
     {
@@ -468,6 +472,7 @@ int oufs_rmdir(char *cwd, char *path)
     pnode.size--;
     //write blocks back to disk
     virtual_disk_write_block(MASTER_BLOCK_REFERENCE, &master);
+    virtual_disk_write_block(cnode.content, &childdirectory);
     virtual_disk_write_block(pnode.content, &directory);
     oufs_write_inode_by_reference(parent, &pnode);
     
