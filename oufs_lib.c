@@ -425,6 +425,7 @@ int oufs_rmdir(char *cwd, char *path)
     {
         return -2;
     }
+    
     BLOCK childdirectory;
     virtual_disk_read_block(cnode.content, &childdirectory);
     int count = 0;
@@ -446,7 +447,7 @@ int oufs_rmdir(char *cwd, char *path)
     if (strcmp(local_name, "..") == 0)
         return -2;
     
-    BLOCK directory;
+        BLOCK directory;
     virtual_disk_read_block(pnode.content, &directory);
     
     // TODO: check this this. seems weird
@@ -470,6 +471,9 @@ int oufs_rmdir(char *cwd, char *path)
     master.content.master.inode_allocated_flag[byte] = master.content.master.inode_allocated_flag[byte] ^ (1<<bit);
     oufs_deallocate_block(&master, child);
     cnode.size--;
+    if(cnode.size==2)
+        cnode.type= UNUSED_TYPE;
+
     //write blocks back to disk
     virtual_disk_write_block(MASTER_BLOCK_REFERENCE, &master);
     virtual_disk_write_block(cnode.content, &childdirectory);
