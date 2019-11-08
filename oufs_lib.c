@@ -412,7 +412,7 @@ int oufs_rmdir(char *cwd, char *path)
     {
         return -1;
     }
-    
+    fprintf(stderr,"localname is %s\n",local_name);
     // TODO: complete implementation
     // TODO: Will be error for: name does not exist, if its not a directory, if name is . or .., and if not an empty directory
     
