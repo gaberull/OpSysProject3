@@ -324,7 +324,8 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
             grandparent = *parent;
             fprintf(stderr, "\tParent inode was %d next round will be %d\n", *parent, *child);
             *parent = temp;
-            //strcpy(local_name, directory_name);
+            if(local_name!=NULL)
+                strcpy(local_name, directory_name);
             directory_name = strtok(NULL, "/");
         }
         else
@@ -340,8 +341,6 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
         *child = temp;
     };
     
-    if(local_name!=NULL)
-        strcpy(local_name, directory_name);
     // Item found.
     
     // Dr. FAGG says this is code is for handling cases like /foo/bar//baz/// pretend it is not here
