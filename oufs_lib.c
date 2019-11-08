@@ -459,7 +459,7 @@ int oufs_rmdir(char *cwd, char *path)
         {
             directory.content.directory.entry[i].inode_reference = UNALLOCATED_INODE;
             // TODO: do i need to remove the name??
-            cnode.size--;
+            pnode.size--;
             break;
         }
     }
