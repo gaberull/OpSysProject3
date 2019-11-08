@@ -469,14 +469,17 @@ int oufs_rmdir(char *cwd, char *path)
     int bit = 7 - (child % 8);
     fprintf(stderr, "byte %d bit %d\n", byte, bit);
     master.content.master.inode_allocated_flag[byte] = master.content.master.inode_allocated_flag[byte] ^ (1<<bit);
-    oufs_deallocate_block(&master, child);
+    
     cnode.size--;
-    if(cnode.size==2)
-        cnode.type= UNUSED_TYPE;
+    //if(cnode.size==2)
+    //    cnode.type= UNUSED_TYPE;
 
     //write blocks back to disk
-    virtual_disk_write_block(MASTER_BLOCK_REFERENCE, &master);
+    
+    oufs_write_inode_by_reference(child, &cnode);
     virtual_disk_write_block(cnode.content, &childdirectory);
+    oufs_deallocate_block(&master, cnode.content);
+    virtual_disk_write_block(MASTER_BLOCK_REFERENCE, &master);
     virtual_disk_write_block(pnode.content, &directory);
     oufs_write_inode_by_reference(parent, &pnode);
     
