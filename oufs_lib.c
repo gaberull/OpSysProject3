@@ -448,7 +448,10 @@ int oufs_rmdir(char *cwd, char *path)
     
     BLOCK directory;
     virtual_disk_read_block(pnode.content, &directory);
-    
+    for (int i=0; i<N_DIRECTORY_ENTRIES_PER_BLOCK; i++)
+    {
+        fprintf(stderr, "checking child directory entry %d:%s\n", i, childdirectory.content.directory.entry[i].name);
+    }
     
     // TODO: check this this. seems weird
     for (int i=0; i<N_DIRECTORY_ENTRIES_PER_BLOCK; i++)
