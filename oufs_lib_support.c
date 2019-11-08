@@ -322,11 +322,13 @@ int oufs_find_file(char *cwd, char * path, INODE_REFERENCE *parent, INODE_REFERE
             fprintf(stderr, "\tFound directory\n");
             //found subdirectory
             grandparent = *parent;
-            fprintf(stderr, "\tParent inode was %d next round will be %d\n", *parent, *child);
-            *parent = temp;
+            fprintf(stderr, "\tParent inode was %d next round will be %d\n", *parent, temp);
+            
             if(local_name!=NULL)
                 strcpy(local_name, directory_name);
             directory_name = strtok(NULL, "/");
+            if(directory_name!=NULL)
+                *parent = temp;
         }
         else
         {
