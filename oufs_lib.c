@@ -454,8 +454,9 @@ int oufs_rmdir(char *cwd, char *path)
     // TODO: check this this. seems weird
     for (int i=0; i<N_DIRECTORY_ENTRIES_PER_BLOCK; i++)
     {
+        fprintf(stderr, "local_name is %s\n", local_name);
         // TODO: check this name check NOT SURE ABOUT THIS
-        if (directory.content.directory.entry[i].name == local_name)
+        if (strcmp(directory.content.directory.entry[i].name, local_name) == 0)
         {
             directory.content.directory.entry[i].inode_reference = UNALLOCATED_INODE;
             // TODO: do i need to remove the name??
@@ -467,9 +468,10 @@ int oufs_rmdir(char *cwd, char *path)
     // change bit in master block's inode allocation table
     int byte = child / 8;
     int bit = 7 - (child % 8);
+    fprintf(stderr, "byte %d bit %d\n", byte, bit);
     master.content.master.inode_allocated_flag[byte] = master.content.master.inode_allocated_flag[byte] ^ (1<<bit);
     oufs_deallocate_block(&master, child);
-    pnode.size--;
+    cnode.size--;
     //write blocks back to disk
     virtual_disk_write_block(MASTER_BLOCK_REFERENCE, &master);
     virtual_disk_write_block(cnode.content, &childdirectory);

@@ -35,6 +35,7 @@ int oufs_deallocate_block(BLOCK *master_block, BLOCK_REFERENCE block_reference)
         // No blocks on the free list.  Both pointers point to this block now
         master_block->content.master.unallocated_front = master_block->content.master.unallocated_end =
         block_reference;
+        fprintf(stderr, "Resetting master unallocated end and front to point to newly empty block.\n");
         
     }else{
         BLOCK prevEndBlock;
@@ -53,6 +54,8 @@ int oufs_deallocate_block(BLOCK *master_block, BLOCK_REFERENCE block_reference)
         }
         
         master_block->content.master.unallocated_end = block_reference;
+        
+        fprintf(stderr, "Resetting master unallocated end to point to newly empty block.\n");
     }
     
     //add block back to unallocated block list
@@ -72,6 +75,7 @@ int oufs_deallocate_block(BLOCK *master_block, BLOCK_REFERENCE block_reference)
         return(-1);
     }
     
+    fprintf(stderr, "Writing block back to disk.\n");
     return(0);
 };
 
