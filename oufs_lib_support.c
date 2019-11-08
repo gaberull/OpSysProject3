@@ -38,7 +38,8 @@ int oufs_deallocate_block(BLOCK *master_block, BLOCK_REFERENCE block_reference)
         
     }else{
         BLOCK prevEndBlock;
-        BLOCK_REFERENCE prevEnd = master_block->content.master.unallocated_end;
+        BLOCK_REFERENCE prevEnd;
+        prevEnd = master_block->content.master.unallocated_end;
         if(virtual_disk_read_block(prevEnd, &prevEndBlock) != 0) {
             fprintf(stderr, "deallocate_block: error reading old end block\n");
             return(-1);

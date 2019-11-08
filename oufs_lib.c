@@ -408,15 +408,69 @@ int oufs_rmdir(char *cwd, char *path)
     if(result < -1) {
         return(-4);
     }
-    else if (result==-1)
+    else if (result==-1)    // could not find child
     {
         return -1;
     }
     
+    // TODO: complete implementation
+    // TODO: Will be error for: name does not exist, if its not a directory, if name is . or .., and if not an empty directory
     
+    //TODO: Remove the entry from the parent's directory block
+    INODE pnode;
+    oufs_read_inode_by_reference(parent, &pnode);
+    // error if type isn't directory type
+    if (pnode.type != DIRECTORY_TYPE)
+    {
+        return -2;
+    }
+    // check to make sure name is not . or ..
+    if (strcmp(local_name, ".") == 0)
+        return -2;
+    if (strcmp(local_name, "..") == 0)
+        return -2;
     
+    BLOCK directory;
+    virtual_disk_read_block(pnode.content, &directory);
+    // check directory's contents to make sure only 2 there
+    int count = 0;
+    for (int i=0; i<N_DIRECTORY_ENTRIES_PER_BLOCK; i++)
+    {
+        if (directory.content.directory.entry[i].inode_reference != UNALLOCATED_INODE)
+        {
+            count++;
+        }
+    }
+    if (count > 2)
+    {
+        //directory is not an empty directory (size of 2)
+        fprintf(stderr, "trying to remove non-empty directory\n");
+        return -2;
+    }
+    // TODO: check this this. seems weird
+    for (int i=0; i<N_DIRECTORY_ENTRIES_PER_BLOCK; i++)
+    {
+        // TODO: check this name check NOT SURE ABOUT THIS
+        if (directory.content.directory.entry[i].name == local_name)
+        {
+            directory.content.directory.entry[i].inode_reference = UNALLOCATED_INODE;
+            // TODO: do i need to remove the name??
+            break;
+        }
+    }
+    BLOCK master;
+    virtual_disk_read_block(MASTER_BLOCK_REFERENCE, &master);
+    // change bit in master block's inode allocation table
+    int byte = child / 8;
+    int bit = 7 - (child % 8);
+    master.content.master.inode_allocated_flag[byte] = master.content.master.inode_allocated_flag[byte] ^ (1<<bit);
+    oufs_deallocate_block(&master, child);
+    pnode.size--;
+    //write blocks back to disk
+    virtual_disk_write_block(MASTER_BLOCK_REFERENCE, &master);
+    virtual_disk_write_block(pnode.content, &directory);
+    oufs_write_inode_by_reference(parent, &pnode);
     
-    // TODO: complet implementation
     
     
     // Success
