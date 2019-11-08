@@ -412,7 +412,6 @@ int oufs_rmdir(char *cwd, char *path)
     {
         return -1;
     }
-    fprintf(stderr,"localname is %s\n",local_name);
     // TODO: complete implementation
     // TODO: Will be error for: name does not exist, if its not a directory, if name is . or .., and if not an empty directory
     
@@ -454,7 +453,7 @@ int oufs_rmdir(char *cwd, char *path)
     // TODO: check this this. seems weird
     for (int i=0; i<N_DIRECTORY_ENTRIES_PER_BLOCK; i++)
     {
-        fprintf(stderr, "local_name is %s\n", local_name);
+        fprintf(stderr, "checking directory entry %d:%s\n", i, directory.content.directory.entry[i].name);
         // TODO: check this name check NOT SURE ABOUT THIS
         if (strcmp(directory.content.directory.entry[i].name, local_name) == 0)
         {
